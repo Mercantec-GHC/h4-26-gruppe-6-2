@@ -104,3 +104,4 @@ yarn.lock
 .obsidian/workspace.json
 Backend/Backend.AppHost/appsettings.Development.json
 /node_modules
+Backend/API/appsettings.Development.json
