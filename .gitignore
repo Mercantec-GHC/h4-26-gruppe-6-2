@@ -103,3 +103,4 @@ yarn.lock
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 .obsidian/workspace.json
 Backend/Backend.AppHost/appsettings.Development.json
+/node_modules
