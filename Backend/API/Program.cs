@@ -1,4 +1,6 @@
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Backend.DbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ builder.AddServiceDefaults();
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 // Add CORS support for Flutter app
 builder.Services.AddCors(options =>
