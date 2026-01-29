@@ -1,6 +1,6 @@
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Backend.DbContext;
+using Backend.AppDbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
