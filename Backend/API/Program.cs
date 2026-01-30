@@ -1,6 +1,10 @@
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Backend.DbContext;
+using Backend.AppDbContext;
+using API.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +14,44 @@ builder.AddServiceDefaults();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+builder.Services.AddScoped<JwtService>();
+
+var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] 
+?? Environment.GetEnvironmentVariable("Jwt:SecretKey");
+
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] 
+?? Environment.GetEnvironmentVariable("Jwt:Issuer");
+
+var jwtAudience = builder.Configuration["Jwt:Audience"] 
+?? Environment.GetEnvironmentVariable("Jwt:Audience");
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+	.AddJwtBearer(options =>
+  {
+	  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(
+    Encoding.ASCII.GetBytes(jwtSecretKey)),
+    ValidateIssuer = true,
+    ValidIssuer = jwtIssuer,
+    ValidateAudience = true,
+    ValidAudience = jwtAudience,
+    ValidateLifetime = true,
+  };
+});
+
+builder.Services.AddAuthorization();
+
 
 // Add CORS support for Flutter app
 builder.Services.AddCors(options =>
