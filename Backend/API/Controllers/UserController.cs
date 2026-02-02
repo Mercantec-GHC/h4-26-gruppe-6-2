@@ -66,11 +66,73 @@ public class UserController : ControllerBase
     }
 
     [Authorize]    
-    [HttpGet("all users") ]
+    [HttpGet("") ]
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _appDbContext.Set<User>().ToListAsync();
         return Ok(users);
+    }
+
+    [HttpPut("")]
+    public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto updatedUser)
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId");
+        if (userIdClaim == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!int.TryParse(userIdClaim.Value, out int userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _appDbContext.Set<User>().FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+
+        // Opdater kun felter, der er angivet og ikke "string" (tillad delvise opdateringer)
+        if (!string.IsNullOrEmpty(updatedUser.Username) && updatedUser.Username != "string")
+            user.Username = updatedUser.Username;
+        if (!string.IsNullOrEmpty(updatedUser.Email) && updatedUser.Email != "string")
+            user.Email = updatedUser.Email;
+        if (!string.IsNullOrEmpty(updatedUser.PasswordHash) && updatedUser.PasswordHash != "string")
+            user.PasswordHash = updatedUser.PasswordHash;
+
+        _appDbContext.Set<User>().Update(user);
+        await _appDbContext.SaveChangesAsync();
+
+        return Ok(user);
+    }
+
+    [Authorize]
+    [HttpDelete("delete user")]
+    public async Task<IActionResult> DeleteUser()
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId");
+        if (userIdClaim == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!int.TryParse(userIdClaim.Value, out int userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _appDbContext.Set<User>().FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        _appDbContext.Set<User>().Remove(user);
+        await _appDbContext.SaveChangesAsync();
+
+        return NoContent();
     }
 }
 
