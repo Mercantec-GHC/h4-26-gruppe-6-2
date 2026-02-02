@@ -10,6 +10,7 @@ using Backend.AppDbContext;
 using global::API.Services;
 using Backend.API.Classes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -49,6 +50,7 @@ public class UserController : ControllerBase
             if (result != null && result.PasswordHash == loginDto.PasswordHash)
             {
                 var token = _jwtService.GenerateToken(result);
+                Response.Headers.Add("x-access-token", token);
                 return Ok(new {
                     message = "Login godkendt!",
                     token = token,
@@ -61,6 +63,14 @@ public class UserController : ControllerBase
             }
         }
         return Unauthorized();
+    }
+
+    [Authorize]    
+    [HttpGet("all users") ]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _appDbContext.Set<User>().ToListAsync();
+        return Ok(users);
     }
 }
 

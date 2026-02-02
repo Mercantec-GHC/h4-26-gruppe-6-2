@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
@@ -85,7 +86,12 @@ builder.Services.AddCors(options =>
 });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    // Tilføjer "Authorize" (Bearer) til OpenAPI-dokumentet (som Swagger UI og Scalar bruger),
+    // så man kan indsætte en JWT token i UI'et.
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 // OpenAPI configuration will be handled by middleware
 
@@ -104,7 +110,7 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/openapi/v1.json", "API v1");
     options.RoutePrefix = "swagger"; // Tilgængelig på /swagger
-    options.AddSwaggerBootstrap(); // UI Pakke lavet af NHave - https://github.com/nhave
+    options.AddSwaggerBootstrap().AddExperimentalFeatures(); // UI Pakke lavet af NHave - https://github.com/nhave
 });
 
 app.UseStaticFiles(); // Vigtig for SwaggerBootstrap pakken
@@ -122,6 +128,7 @@ app.MapScalarApiReference(options =>
 // Enable CORS - SKAL være før UseAuthorization
 app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowFlutterApp");
 
+app.UseAuthentication();
 
 app.UseAuthorization();
 
