@@ -2,18 +2,40 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-nativ
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { LoginStackParamList } from '../../Navigation/LoginNavigator'
+import { login } from '../../api'
+
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, 'Login'>
 
 const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const { setIsLoggedIn } = route.params
 
-  const handleLogin = () => {
-    // Simple validation - in a real app, this would call your backend API
-    if (email && password) {
-      setIsLoggedIn(true)
+  const handleLogin = async(email: string, password: string) => {
+  
+    try {
+      const response = await login(email, password);
+      console.log('Login response:', response);
+
+      if (!response.ok) {
+        setError('Login failed. Check your credentials.');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Login response data:', data);
+      if (data && data.token) {
+        // You can store the token in AsyncStorage or context for later use
+        console.log('Login successful, token:', data.token);
+         setIsLoggedIn(true);
+      } else {
+        setError('Login failed. No token received.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
     }
   }
 
@@ -43,7 +65,7 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
         secureTextEntry
       />
       
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={styles.button} onPress={() => handleLogin(email, password)}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
     </View>
@@ -51,6 +73,7 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
 }
 
 export default LoginScreen
+
 
 const styles = StyleSheet.create({
   container: {
