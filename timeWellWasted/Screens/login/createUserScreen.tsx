@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { LoginStackParamList } from '../../Navigation/LoginNavigator'
@@ -10,15 +10,50 @@ const CreateUserScreen = ({ navigation, route }: CreateUserScreenProps) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
+  const [loading, setLoading] = useState(false)
   const { setIsLoggedIn } = route.params
 
-  const handleCreateUser = () => {
-    // Simple validation
-    if (email && password && confirmPassword && name && password === confirmPassword) {
-      // In a real app, this would call your backend API
-      setIsLoggedIn(true)
-    } else {
-      alert('Please fill all fields and ensure passwords match')
+  const API_BASE_URL = 'https://timewellwasted-api.mercantec.tech/api'
+
+  const handleCreateUser = async () => {
+    // Validering
+    if (!email || !password || !confirmPassword || !name) {
+      alert('Udfyld alle felter')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      alert('Adgangskoderne stemmer ikke overens')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: name,
+          email: email,
+          password: password,
+        }),
+      })
+
+      if (response.ok) {
+        alert('Konto oprettet!')
+        setIsLoggedIn(true)
+      } else {
+        const errorData = await response.json()
+        alert(`Fejl: ${errorData.message || 'Kunne ikke oprette konto'}`)
+      }
+    } catch (error) {
+      console.error('Fejl ved oprettelse af konto:', error)
+      alert('Kunne ikke oprette konto. Kontroller din forbindelse og prøv igen.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -65,8 +100,16 @@ const CreateUserScreen = ({ navigation, route }: CreateUserScreenProps) => {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleCreateUser}>
-        <Text style={styles.buttonText}>Create Account</Text>
+      <TouchableOpacity 
+        style={[styles.button, loading && styles.buttonDisabled]} 
+        onPress={handleCreateUser}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Create Account</Text>
+        )}
       </TouchableOpacity>
     </View>
   )
@@ -112,6 +155,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 20,
     alignItems: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: 'white',

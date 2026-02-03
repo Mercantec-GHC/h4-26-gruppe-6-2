@@ -1,10 +1,7 @@
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { LoginNavigator } from './LoginNavigator'
-import HomeScreen from '../Screens/homeScreen'
-
-const Stack = createNativeStackNavigator()
+import { AppNavigator } from './AppNavigator'
 
 interface RootNavigatorProps {
   isLoggedIn: boolean
@@ -17,20 +14,11 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({
 }) => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!isLoggedIn ? (
-          <Stack.Screen
-            name="LoginStack"
-            children={() => <LoginNavigator setIsLoggedIn={setIsLoggedIn} />}
-          />
-        ) : (
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            initialParams={{ setIsLoggedIn }}
-          />
-        )}
-      </Stack.Navigator>
+      {isLoggedIn ? (
+        <AppNavigator setIsLoggedIn={setIsLoggedIn} />
+      ) : (
+        <LoginNavigator setIsLoggedIn={setIsLoggedIn} />
+      )}
     </NavigationContainer>
   )
 }

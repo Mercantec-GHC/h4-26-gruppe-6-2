@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Classes;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Backend.DbContext
+namespace Backend.AppDbContext
 {
-    public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
