@@ -2,10 +2,12 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import HomeScreen from '../Screens/homeScreen'
 import ActivityScreen from '../Screens/activityScreen'
+import ProfileScreen from '../Screens/profileScreen'
 
 export type AppStackParamList = {
   Home: { setIsLoggedIn: (value: boolean) => void }
   Activity: undefined
+  Profile: undefined
 }
 
 const Stack = createNativeStackNavigator<AppStackParamList>()
@@ -25,6 +27,10 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({ setIsLoggedIn }) => 
       <Stack.Screen
         name="Activity"
         component={ActivityScreen}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
       />
     </Stack.Navigator>
   )
