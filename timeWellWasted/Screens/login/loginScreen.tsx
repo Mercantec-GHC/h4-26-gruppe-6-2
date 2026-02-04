@@ -16,26 +16,21 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
   const handleLogin = async(email: string, password: string) => {
   
     try {
-      const response = await login(email, password);
-      console.log('Login response:', response);
+      const data = await login(email, password);
+      console.log('Login successful, data:', data);
 
-      if (!response.ok) {
-        setError('Login failed. Check your credentials.');
-        return;
-      }
-
-      const data = await response.json();
-      console.log('Login response data:', data);
       if (data && data.token) {
         // You can store the token in AsyncStorage or context for later use
         console.log('Login successful, token:', data.token);
-         setIsLoggedIn(true);
+        console.log('About to call setIsLoggedIn...');
+        setIsLoggedIn(true);
+        console.log('setIsLoggedIn called');
       } else {
         setError('Login failed. No token received.');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An unexpected error occurred. Please try again.');
+      setError('Login failed. Check your credentials.');
     }
   }
 
