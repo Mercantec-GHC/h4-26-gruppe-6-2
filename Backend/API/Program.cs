@@ -123,7 +123,7 @@ app.MapScalarApiReference(options =>
 
 
 // Enable CORS - SKAL være før UseAuthorization
-app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowFlutterApp");
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowAllLocalhost");
 
 
 app.UseAuthorization();
