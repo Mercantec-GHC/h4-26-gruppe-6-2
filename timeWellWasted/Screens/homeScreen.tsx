@@ -1,56 +1,136 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { AppStackParamList } from '../Navigation/AppNavigator'
 
-const HomeScreen = ({ route }: any) => {
+
+
+type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
+
+const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
 
-  const handleLogout = () => {
+  const tilføjAktivitet = () => {
+    navigation.navigate('Activity')
+  }
+
+  const viewProfile = () => {
+    navigation.navigate('Profile')
+  }
+
+  const logout = () => {
     setIsLoggedIn(false)
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Din tid i dag</Text>
-      <Text style={styles.subtitle}>Time Well Wasted</Text>
-      
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Din tid i dag</Text>
+        <TouchableOpacity onPress={logout}>
+          <Text style={styles.logoutText}>Log ud</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={viewProfile}>
+          <Text style={styles.profileText}>Profil</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Middle Content */}
+      <View style={styles.content}>
+        <Text style={styles.subtitle}>Time Well Wasted</Text>
+      </View>
+
+      {/* Bottom Section */}
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity
+          style={styles.tilføjAktivitet}
+          onPress={tilføjAktivitet}
+        >
+          <Text style={styles.buttonText}>+ Tilføj Aktivitet</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.footerText}>
+          Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst
+        </Text>
+      </View>
+    </SafeAreaView>
   )
 }
 
 export default HomeScreen
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
     backgroundColor: '#fff',
   },
+
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: '#333',
   },
-  subtitle: {
+
+  logoutText: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 30,
+    color: '#4DAFFF',
+    fontWeight: '600',
   },
-  logoutButton: {
-    padding: 15,
-    backgroundColor: '#FF3B30',
-    borderRadius: 8,
+
+  profileText: {
+    fontSize: 16,
+    color: '#4DAFFF',
+    fontWeight: '600',
+  },
+
+  content: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
   },
+
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
+  },
+
+  bottomContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    alignItems: 'center',
+  },
+
+  tilføjAktivitet: {
+    paddingVertical: 15,
+    width: '100%',
+    backgroundColor: '#4DAFFF',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
+  },
+
+  footerText: {
+    marginTop: 30,
+    fontSize: 16,
+    color: '#585858',
+    textAlign: 'center',
   },
 })

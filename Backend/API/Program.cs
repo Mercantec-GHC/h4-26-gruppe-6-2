@@ -5,31 +5,44 @@ using API.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+// Nødvendigt når API kører bag reverse proxy (fx Cloudflare tunnel): brug X-Forwarded-* headers
+// så Swagger/OpenAPI og redirects bruger HTTPS på dit domæne i stedet for lokal HTTP.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+?? Environment.GetEnvironmentVariable("ConnectionStrings__db");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(connectionString)
 );
 
 builder.Services.AddScoped<JwtService>();
 
 var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] 
-?? Environment.GetEnvironmentVariable("Jwt:SecretKey");
+?? Environment.GetEnvironmentVariable("Jwt__SecretKey");
 
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] 
-?? Environment.GetEnvironmentVariable("Jwt:Issuer");
+?? Environment.GetEnvironmentVariable("Jwt__Issuer");
 
 var jwtAudience = builder.Configuration["Jwt:Audience"] 
-?? Environment.GetEnvironmentVariable("Jwt:Audience");
+?? Environment.GetEnvironmentVariable("Jwt__Audience");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -126,7 +139,7 @@ app.MapScalarApiReference(options =>
 
 
 // Enable CORS - SKAL være før UseAuthorization
-app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowFlutterApp");
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowAllLocalhost");
 
 app.UseAuthentication();
 
