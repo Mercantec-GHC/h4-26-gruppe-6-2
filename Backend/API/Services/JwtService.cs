@@ -21,16 +21,16 @@ namespace API.Services
         {
             _configuration = configuration;
 	          _secretKey = _configuration["Jwt:SecretKey"] 
-	          ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+	          ?? Environment.GetEnvironmentVariable("Jwt__SecretKey");
 
             _issuer = _configuration["Jwt:Issuer"] 
-            ?? Environment.GetEnvironmentVariable("JWT_ISSUER");
+            ?? Environment.GetEnvironmentVariable("Jwt__Issuer");
             
             _audience = _configuration["Jwt:Audience"] 
-            ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+            ?? Environment.GetEnvironmentVariable("Jwt__Audience");
             
             _expiryMinutes = int.Parse(_configuration["Jwt:ExpiryMinutes"] 
-            ?? Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES"));
+            ?? Environment.GetEnvironmentVariable("Jwt__ExpiryMinutes"));
         }
 
         /// <summary>

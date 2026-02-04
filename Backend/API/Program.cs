@@ -15,20 +15,23 @@ builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+?? Environment.GetEnvironmentVariable("ConnectionStrings__db");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(connectionString)
 );
 
 builder.Services.AddScoped<JwtService>();
 
 var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] 
-?? Environment.GetEnvironmentVariable("Jwt:SecretKey");
+?? Environment.GetEnvironmentVariable("Jwt__SecretKey");
 
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] 
-?? Environment.GetEnvironmentVariable("Jwt:Issuer");
+?? Environment.GetEnvironmentVariable("Jwt__Issuer");
 
 var jwtAudience = builder.Configuration["Jwt:Audience"] 
-?? Environment.GetEnvironmentVariable("Jwt:Audience");
+?? Environment.GetEnvironmentVariable("Jwt__Audience");
 
 builder.Services.AddAuthentication(options =>
 {
