@@ -5,10 +5,20 @@ using API.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+// Nødvendigt når API kører bag reverse proxy (fx Cloudflare tunnel): brug X-Forwarded-* headers
+// så Swagger/OpenAPI og redirects bruger HTTPS på dit domæne i stedet for lokal HTTP.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 
 // Add services to the container.
