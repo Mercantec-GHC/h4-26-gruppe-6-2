@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'½
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 
 const ProfileScreen = () => {
@@ -32,7 +32,6 @@ const ProfileScreen = () => {
           <Text style={styles.deleteButtonText}>Slet profil</Text>
         </TouchableOpacity>
       </View>
-
     </View>
   )
 }

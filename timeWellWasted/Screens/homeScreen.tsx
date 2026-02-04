@@ -20,6 +20,10 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.navigate('Activity')
   }
 
+  const viewProfile = () => {
+    navigation.navigate('Profile')
+  }
+
   const logout = () => {
     setIsLoggedIn(false)
   }
@@ -31,6 +35,9 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         <Text style={styles.title}>Din tid i dag</Text>
         <TouchableOpacity onPress={logout}>
           <Text style={styles.logoutText}>Log ud</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={viewProfile}>
+          <Text style={styles.profileText}>Profil</Text>
         </TouchableOpacity>
       </View>
 
@@ -78,6 +85,12 @@ const styles = StyleSheet.create({
   },
 
   logoutText: {
+    fontSize: 16,
+    color: '#4DAFFF',
+    fontWeight: '600',
+  },
+
+  profileText: {
     fontSize: 16,
     color: '#4DAFFF',
     fontWeight: '600',
