@@ -3,9 +3,12 @@ import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { LoginStackParamList } from '../../Navigation/LoginNavigator'
 import { login } from '../../api'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, 'Login'>
+
+
 
 const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
   const [email, setEmail] = useState('')
@@ -20,6 +23,11 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
       console.log('Login successful, data:', data);
 
       if (data && data.token) {
+
+        console.log('Saving userId to AsyncStorage:', data.user?.id)
+        await AsyncStorage.setItem('auth_token', data.token)
+        await AsyncStorage.setItem('auth_userId', String(data.user?.id))
+
         // You can store the token in AsyncStorage or context for later use
         console.log('Login successful, token:', data.token);
         console.log('About to call setIsLoggedIn...');
