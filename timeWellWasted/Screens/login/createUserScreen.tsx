@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator 
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { LoginStackParamList } from '../../Navigation/LoginNavigator'
+import { register } from '../../api'
 
 type CreateUserScreenProps = NativeStackScreenProps<LoginStackParamList, 'CreateUser'>
 
@@ -12,8 +13,6 @@ const CreateUserScreen = ({ navigation, route }: CreateUserScreenProps) => {
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const { setIsLoggedIn } = route.params
-
-  const API_BASE_URL = 'https://timewellwasted-api.mercantec.tech/api'
 
   const handleCreateUser = async () => {
     // Validering
@@ -30,25 +29,13 @@ const CreateUserScreen = ({ navigation, route }: CreateUserScreenProps) => {
     setLoading(true)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/user/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: name,
-          email: email,
-          password: password,
-        }),
+      await register({
+        email: email,
+        username: name,
+        passwordHash: password,
       })
-
-      if (response.ok) {
-        alert('Konto oprettet!')
-        setIsLoggedIn(true)
-      } else {
-        const errorData = await response.json()
-        alert(`Fejl: ${errorData.message || 'Kunne ikke oprette konto'}`)
-      }
+      alert('Konto oprettet!')
+      setIsLoggedIn(true)
     } catch (error) {
       console.error('Fejl ved oprettelse af konto:', error)
       alert('Kunne ikke oprette konto. Kontroller din forbindelse og prøv igen.')
