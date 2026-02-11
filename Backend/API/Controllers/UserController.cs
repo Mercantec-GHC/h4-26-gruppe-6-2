@@ -28,9 +28,21 @@ public class UserController : ControllerBase
         _jwtService = jwtService;
     }
 
+   
+
     [HttpPost("create user")]
-    public async Task<IActionResult> Register([FromBody] User user)
+    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
     {
+        if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.Email))
+        {
+            return BadRequest("Email and password are required.");
+        }
+        var passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerDto.Password, 13);
+        var user = new User {
+            Username = registerDto.Username,
+            Email = registerDto.Email,
+            PasswordHash = passwordHash
+        };
         _appDbContext.Set<User>().Add(user);
         await _appDbContext.SaveChangesAsync();
         return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
@@ -38,16 +50,16 @@ public class UserController : ControllerBase
 
     public class LoginDto {
         public string Email { get; set; }
-        public string PasswordHash { get; set; }
+        public string Password { get; set; }
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        if (ModelState.IsValid && !string.IsNullOrEmpty(loginDto.Email) && !string.IsNullOrEmpty(loginDto.PasswordHash))
+        if (ModelState.IsValid && !string.IsNullOrEmpty(loginDto.Email) && !string.IsNullOrEmpty(loginDto.Password))
         {
             var result = await _appDbContext.Set<User>().FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-            if (result != null && result.PasswordHash == loginDto.PasswordHash)
+            if (result != null && BCrypt.Net.BCrypt.EnhancedVerify(loginDto.Password, result.PasswordHash))
             {
                 var token = _jwtService.GenerateToken(result);
                 Response.Headers.Add("x-access-token", token);
