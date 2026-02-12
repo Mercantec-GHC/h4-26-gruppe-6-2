@@ -142,12 +142,14 @@ const ActivityScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.timerContainer}>
-        <Image
-          source={require('../assets/images/imageTimer.png')}
-          style={styles.image}
-          resizeMode="contain"
-        />
-        <Text style={styles.timeText}>{formatTime(elapsed)}</Text>
+        <View style={styles.imageWrapper}>
+          <Image
+            source={require('../assets/images/imageTimer.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+          <Text style={styles.timeTextOverlay}>{formatTime(elapsed)}</Text>
+        </View>
       </View>
 
       <View style={styles.controls}>
@@ -195,23 +197,41 @@ const styles = StyleSheet.create({
 
   timerContainer: {
     alignItems: 'center',
-    marginTop: 20, // pushes it down slightly from top
+    flex: 1,
+    marginTop: 20,
+    justifyContent: 'center',
+  },
+
+  imageWrapper: {
+    width: 350,
+    height: 350,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    marginBottom: -30,
   },
 
   image: {
     width: 350,
     height: 350,
-    marginBottom: 20,
   },
 
-  timeText: {
+  timeTextOverlay: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -79 }, { translateY: -36 }],
     fontSize: 32,
     fontWeight: 'bold',
     color: '#333',
+  
+    paddingHorizontal: 15,
+    paddingVertical: -20,
+    textAlign: 'center',
   },
 
   controls: {
-    marginTop: 40,
+    marginTop: 5,
     alignItems: 'center',
   },
 
@@ -232,7 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginTop: 50,
+    marginTop: 20,
   },
 
   buttonPause: {
@@ -251,6 +271,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     margin: 5,
+    marginBottom: 25,
   },
 
   buttonText: {
