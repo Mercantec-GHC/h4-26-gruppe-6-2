@@ -5,7 +5,8 @@ namespace Backend.Classes
         public int Id { get; set; }
         public string? Username { get; set; }
         public string? Email { get; set; }
-        public string? PasswordHash { get; set; }
+        // Remove plain Password property for security
+        public string PasswordHash { get; set; }
     }
 
     public class UserUpdateDto
@@ -14,6 +15,12 @@ namespace Backend.Classes
         public string? Email { get; set; }
         public string? PasswordHash { get; set; }
     }
+
+    public class RegisterDto {
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+}
 
     
 }

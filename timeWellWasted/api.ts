@@ -4,13 +4,13 @@ export async function login(email: string, password: string) {
   const response = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, passwordHash: password }),
+    body: JSON.stringify({ email, password }),
   });
   if (!response.ok) throw new Error('Login failed');
   return await response.json();
 }
 
-export async function register(user: { email: string; passwordHash: string; username: string }) {
+export async function register(user: { email: string; password: string; username: string }) {
   const response = await fetch(`${BASE_URL}/create user`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
