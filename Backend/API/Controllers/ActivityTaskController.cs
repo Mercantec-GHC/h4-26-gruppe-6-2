@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
+using System.Security.Claims;
 using Backend.AppDbContext;
 using Backend.Classes;
 
@@ -24,7 +27,25 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ActivityTask>>> GetAll()
         {
-            var items = await _context.ActivityTasks!.ToListAsync();
+            var userId = GetUserId();
+            var items = await _context.ActivityTasks!
+                .Where(a => a.UserId == userId)
+                .ToListAsync();
+            return Ok(items);
+        }
+
+        // GET: api/ActivityTask/today
+        [HttpGet("today")]
+        public async Task<ActionResult<IEnumerable<ActivityTask>>> GetToday()
+        {
+            var userId = GetUserId();
+            var start = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
+            var end = DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc);
+            var items = await _context.ActivityTasks!
+                .Where(a => a.UserId == userId && a.WhenStarted >= start && a.WhenStarted < end)
+                .OrderBy(a => a.WhenStarted)
+                .ToListAsync();
+
             return Ok(items);
         }
 
@@ -32,7 +53,9 @@ namespace API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ActivityTask>> Get(int id)
         {
-            var item = await _context.ActivityTasks!.FindAsync(id);
+            var userId = GetUserId();
+            var item = await _context.ActivityTasks!
+                .FirstOrDefaultAsync(a => a.ActivityId == id && a.UserId == userId);
             if (item == null) return NotFound();
             return Ok(item);
         }
@@ -41,6 +64,11 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<ActivityTask>> Create(ActivityTask activityTask)
         {
+            var userId = GetUserId();       
+            activityTask.UserId = userId;
+            activityTask.WhenStarted = EnsureUtc(activityTask.WhenStarted);
+            activityTask.WhenEnded = EnsureUtc(activityTask.WhenEnded);
+
             _context.ActivityTasks!.Add(activityTask);
             await _context.SaveChangesAsync();
 
@@ -53,8 +81,15 @@ namespace API.Controllers
         {
             if (id != activityTask.ActivityId) return BadRequest();
 
-            var exists = await _context.ActivityTasks!.AsNoTracking().AnyAsync(a => a.ActivityId == id);
+            var userId = GetUserId();
+            var exists = await _context.ActivityTasks!
+                .AsNoTracking()
+                .AnyAsync(a => a.ActivityId == id && a.UserId == userId);
             if (!exists) return NotFound();
+
+            activityTask.UserId = userId;
+            activityTask.WhenStarted = EnsureUtc(activityTask.WhenStarted);
+            activityTask.WhenEnded = EnsureUtc(activityTask.WhenEnded);
 
             _context.ActivityTasks.Update(activityTask);
             await _context.SaveChangesAsync();
@@ -66,7 +101,9 @@ namespace API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await _context.ActivityTasks!.FindAsync(id);
+            var userId = GetUserId();
+            var item = await _context.ActivityTasks!
+                .FirstOrDefaultAsync(a => a.ActivityId == id && a.UserId == userId);
             if (item == null) return NotFound();
 
             _context.ActivityTasks.Remove(item);
@@ -74,5 +111,27 @@ namespace API.Controllers
 
             return NoContent();
         }
+
+        private static DateTime EnsureUtc(DateTime value)
+        {
+            if (value.Kind == DateTimeKind.Utc) return value;
+            if (value.Kind == DateTimeKind.Unspecified)
+            {
+                return DateTime.SpecifyKind(value, DateTimeKind.Utc);
+            }
+
+            return value.ToUniversalTime();
+        }
+
+        private int GetUserId()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+            return userId;
+        }
     }
 }
+
