@@ -17,7 +17,7 @@ namespace API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -33,6 +33,12 @@ namespace API.Migrations
                     b.Property<string>("ActivityName")
                         .HasColumnType("text");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("WhenEnded")
                         .HasColumnType("timestamp with time zone");
 
@@ -40,6 +46,8 @@ namespace API.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ActivityId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ActivityTasks");
                 });
@@ -64,6 +72,17 @@ namespace API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Backend.Classes.ActivityTask", b =>
+                {
+                    b.HasOne("Backend.Classes.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
