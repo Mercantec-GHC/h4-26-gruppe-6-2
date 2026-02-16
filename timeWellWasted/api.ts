@@ -66,4 +66,29 @@ export async function getTodayActivities(token: string) {
   return await response.json();
 }
 
+
+// Update an activity task by id
+export async function updateActivityTask(
+  id: number,
+  activityTask: {
+    activityId: number;
+    activityName: string;
+    description: string;
+    whenStarted: string;
+    whenEnded: string;
+  },
+  token: string
+) {
+  const response = await fetch(`${ACTIVITY_BASE_URL}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(activityTask),
+  });
+  if (!response.ok) throw new Error('Failed to update activity');
+  // No content expected
+}
+
 // Add similar functions for updateUser and deleteUser as needed.

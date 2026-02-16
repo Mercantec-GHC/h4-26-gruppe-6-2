@@ -50,7 +50,7 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
 
       <Text style={styles.title}>Login</Text>
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      
       
       <TextInput
         style={styles.input}

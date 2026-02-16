@@ -8,6 +8,8 @@ import {
   SafeAreaView,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useRoute, RouteProp } from '@react-navigation/native'
+import { updateActivityTask } from '../api'
 
 const getCurrentUserId = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('auth_userId')
@@ -15,12 +17,39 @@ const getCurrentUserId = async (): Promise<string | null> => {
 
 // Remove top-level await and STORAGE_KEY initialization
 
+type ActivityScreenRouteParams = {
+  activityId?: number
+  activityName?: string
+  activityDescription?: string
+}
+
 const ActivityScreen = () => {
   const [userId, setUserId] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
+  const route = useRoute<RouteProp<{ params: ActivityScreenRouteParams }, 'params'>>()
+  const [activityId, setActivityId] = useState<number | null>(route.params?.activityId ?? null)
+  const [activityName, setActivityName] = useState<string>(route.params?.activityName || "")
+  const [activityDescription, setActivityDescription] = useState<string>(route.params?.activityDescription || "")
+
+  // If no params, try to get latest activity from AsyncStorage ('latest_activity')
+  useEffect(() => {
+    if (activityName && activityDescription && activityId) return;
+    const loadLatest = async () => {
+      try {
+        const latestJson = await AsyncStorage.getItem('latest_activity');
+        if (latestJson) {
+          const latest = JSON.parse(latestJson);
+          setActivityName(latest.activityName || "");
+          setActivityDescription(latest.activityDescription || "");
+          if (latest.activityId) setActivityId(latest.activityId);
+        }
+      } catch {}
+    };
+    loadLatest();
+  }, []);
 
   // Restore timer on app start, only when userId is set
   useEffect(() => {
@@ -117,12 +146,34 @@ const ActivityScreen = () => {
   }
 
   const stopTimer = async () => {
-    if (!userId) return
-    await AsyncStorage.removeItem(`timer_${userId}`)
-    setIsRunning(false)
-    setIsPaused(false)
-    setStartTime(null)
-    setElapsed(0)
+    if (!userId) return;
+    setIsRunning(false);
+    setIsPaused(false);
+    setStartTime(null);
+    // Do NOT reset elapsed, just stop counting
+
+    // Update activity in DB if possible
+    try {
+      const token = await AsyncStorage.getItem('auth_token');
+      if (token && activityId && activityName) {
+        const whenStarted = startTime ? new Date(startTime).toISOString() : new Date(Date.now() - elapsed).toISOString();
+        const whenEnded = new Date(startTime ? startTime + elapsed : Date.now()).toISOString();
+        await updateActivityTask(
+          activityId,
+          {
+            activityId,
+            activityName,
+            description: activityDescription,
+            whenStarted,
+            whenEnded,
+          },
+          token
+        );
+      }
+    } catch (e) {
+      // Optionally show error
+    }
+    await AsyncStorage.removeItem(`timer_${userId}`);
   }
 
 
@@ -137,6 +188,7 @@ const ActivityScreen = () => {
       .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   }
 
+    // Remove ActivityName and ActivityDescription components
 
 
   return (
@@ -153,8 +205,10 @@ const ActivityScreen = () => {
       </View>
 
       <View style={styles.controls}>
-        <Text style={styles.controlsHeader}>Tiktok</Text>
-        <Text style={styles.controlsText}>Alle elsker da lidt brainrot</Text>
+        <Text style={styles.controlsHeader}>Activity name</Text>
+        <Text style={styles.controlsText}>{activityName || "Ingen aktivitet valgt"}</Text>
+        <Text style={styles.controlsHeader}>Description</Text>
+        <Text style={styles.controlsText}>{activityDescription || "Ingen beskrivelse"}</Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -183,6 +237,8 @@ const ActivityScreen = () => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+
+    
   )
 }
 

@@ -82,19 +82,30 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
       const now = new Date()
       
-      await createActivityTask(
+      const created = await createActivityTask(
         activityName,
         activityDescription,
         now.toISOString(),
         now.toISOString(),
         token
       )
-      
+
+      // Save latest activityId and info to AsyncStorage for ActivityScreen
+      await AsyncStorage.setItem('latest_activity', JSON.stringify({
+        activityId: created.activityId,
+        activityName,
+        activityDescription
+      }))
+
       setShowModal(false)
       setActivityName('')
       setActivityDescription('')
       alert('Aktivitet oprettet!')
-      navigation.navigate('Activity')
+      navigation.navigate('Activity', {
+        activityId: created.activityId,
+        activityName,
+        activityDescription
+      })
       loadTodayActivities()
     } catch (error) {
       console.error('Fejl ved oprettelse af aktivitet:', error)

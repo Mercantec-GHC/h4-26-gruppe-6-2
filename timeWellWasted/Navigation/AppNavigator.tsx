@@ -6,7 +6,11 @@ import ProfileScreen from '../Screens/profileScreen'
 
 export type AppStackParamList = {
   Home: { setIsLoggedIn: (value: boolean) => void }
-  Activity: undefined
+  Activity: {
+    activityId?: number
+    activityName?: string
+    activityDescription?: string
+  }
   Profile: undefined
 }
 
