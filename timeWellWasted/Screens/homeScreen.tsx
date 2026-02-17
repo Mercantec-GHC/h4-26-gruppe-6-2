@@ -10,14 +10,14 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { AppStackParamList } from '../Navigation/AppNavigator'
+import { AppTabParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { useEffect, useState } from 'react'
 
 
 
-type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
+type Props = NativeStackScreenProps<AppTabParamList, 'Home'>
 
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
