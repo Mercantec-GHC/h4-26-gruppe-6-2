@@ -1,13 +1,71 @@
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Backend.AppDbContext;
+using API.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+// Nødvendigt når API kører bag reverse proxy (fx Cloudflare tunnel): brug X-Forwarded-* headers
+// så Swagger/OpenAPI og redirects bruger HTTPS på dit domæne i stedet for lokal HTTP.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+?? Environment.GetEnvironmentVariable("ConnectionStrings__db");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString)
+);
+
+builder.Services.AddScoped<JwtService>();
+
+var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] 
+?? Environment.GetEnvironmentVariable("Jwt__SecretKey");
+
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] 
+?? Environment.GetEnvironmentVariable("Jwt__Issuer");
+
+var jwtAudience = builder.Configuration["Jwt:Audience"] 
+?? Environment.GetEnvironmentVariable("Jwt__Audience");
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+	.AddJwtBearer(options =>
+  {
+	  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(
+    Encoding.ASCII.GetBytes(jwtSecretKey)),
+    ValidateIssuer = true,
+    ValidIssuer = jwtIssuer,
+    ValidateAudience = true,
+    ValidAudience = jwtAudience,
+    ValidateLifetime = true,
+  };
+});
+
+builder.Services.AddAuthorization();
+
 
 // Add CORS support for Flutter app
 builder.Services.AddCors(options =>
@@ -41,7 +99,12 @@ builder.Services.AddCors(options =>
 });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    // Tilføjer "Authorize" (Bearer) til OpenAPI-dokumentet (som Swagger UI og Scalar bruger),
+    // så man kan indsætte en JWT token i UI'et.
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 // OpenAPI configuration will be handled by middleware
 
@@ -60,7 +123,7 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/openapi/v1.json", "API v1");
     options.RoutePrefix = "swagger"; // Tilgængelig på /swagger
-    options.AddSwaggerBootstrap(); // UI Pakke lavet af NHave - https://github.com/nhave
+    options.AddSwaggerBootstrap().AddExperimentalFeatures(); // UI Pakke lavet af NHave - https://github.com/nhave
 });
 
 app.UseStaticFiles(); // Vigtig for SwaggerBootstrap pakken
@@ -76,8 +139,9 @@ app.MapScalarApiReference(options =>
 
 
 // Enable CORS - SKAL være før UseAuthorization
-app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowFlutterApp");
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAllLocalhost" : "AllowAllLocalhost");
 
+app.UseAuthentication();
 
 app.UseAuthorization();
 

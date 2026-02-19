@@ -1,0 +1,123 @@
+import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native'
+import React, { useState } from 'react'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { LoginStackParamList } from '../../Navigation/LoginNavigator'
+import { login } from '../../api'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+
+type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, 'Login'>
+
+
+
+const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const { setIsLoggedIn } = route.params
+
+  const handleLogin = async(email: string, password: string) => {
+  
+    try {
+      const data = await login(email, password);
+      console.log('Login successful, data:', data);
+
+      if (data && data.token) {
+
+        console.log('Saving userId to AsyncStorage:', data.user?.id)
+        await AsyncStorage.setItem('auth_token', data.token)
+        await AsyncStorage.setItem('auth_userId', String(data.user?.id))
+
+        // You can store the token in AsyncStorage or context for later use
+        console.log('Login successful, token:', data.token);
+        console.log('About to call setIsLoggedIn...');
+        setIsLoggedIn(true);
+        console.log('setIsLoggedIn called');
+      } else {
+        setError('Login failed. No token received.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Login failed. Check your credentials.');
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.backButton}>← Back</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Login</Text>
+
+      
+      
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#999"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#999"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      
+      <TouchableOpacity style={styles.button} onPress={() => handleLogin(email, password)}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+export default LoginScreen
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#007AFF',
+    marginBottom: 20,
+    fontWeight: '600',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    color: '#333',
+  },
+  input: {
+    width: '100%',
+    padding: 15,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  button: {
+    width: '100%',
+    padding: 15,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+})
