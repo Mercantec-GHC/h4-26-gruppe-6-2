@@ -14,6 +14,15 @@ import { AppStackParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { useEffect, useState } from 'react'
+import { ScrollView } from 'react-native'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faTiktok, faYoutube, faInstagram, faFacebook, faSnapchat, faSpotify } from '@fortawesome/free-brands-svg-icons'
+import { faClock } from '@fortawesome/free-regular-svg-icons'
+import { faLaptopCode } from '@fortawesome/free-solid-svg-icons'
+import { faSteam } from '@fortawesome/free-brands-svg-icons/faSteam'
+import { faDev } from '@fortawesome/free-brands-svg-icons/faDev'
+import { faNeos } from '@fortawesome/free-brands-svg-icons/faNeos'
+
 
 
 
@@ -189,34 +198,37 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
       </View>
 
       {/* Middle Content */}
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>Time Well Wasted</Text>
-        <View style={styles.listContainer}>
-          {isLoadingActivities ? (
-            <ActivityIndicator color="#4DAFFF" />
-          ) : activitiesError ? (
-            <Text style={styles.errorText}>{activitiesError}</Text>
-          ) : todayActivities.length === 0 ? (
-            <Text style={styles.emptyText}>Ingen aktiviteter i dag</Text>
-          ) : (
-            todayActivities.map((activity) => (
-              <View key={activity.activityId} style={styles.activityItem}>
-                <View style={styles.activityIconWrap}>
-                  <Text style={styles.activityIcon}>
-                    {getActivityIcon(activity.activityName)}
-                  </Text>
-                </View>
-                <View style={styles.activityTextWrap}>
-                  <Text style={styles.activityName}>{activity.activityName || 'Uden navn'}</Text>
-                  <Text style={styles.activityTime}>
-                    {formatDuration(activity.whenStarted, activity.whenEnded)}
-                  </Text>
-                </View>
-              </View>
-            ))
-          )}
+        <View style={styles.content}>
+          <Text style={styles.subtitle}>Time Well Wasted</Text>
+          <View style={styles.activitiesBox}>
+            <ScrollView contentContainerStyle={styles.activitiesScrollContent} showsVerticalScrollIndicator={false}>
+              {isLoadingActivities ? (
+                <ActivityIndicator color="#4DAFFF" />
+              ) : activitiesError ? (
+                <Text style={styles.errorText}>{activitiesError}</Text>
+              ) : todayActivities.length === 0 ? (
+                <Text style={styles.emptyText}>Ingen aktiviteter i dag</Text>
+              ) : (
+                todayActivities.map((activity, idx) => (
+                  <View key={activity.activityId} style={[styles.activityItem, idx === 0 && {marginTop: 8}]}> 
+                      <View style={styles.activityIconWrap}>
+                        <Text style={styles.activityIcon}>
+                          {getActivityIcon(activity.activityName)}
+                        </Text>
+                      </View>
+                    <View style={styles.activityTextWrap}>
+                      <Text style={styles.activityName}>{activity.activityName || 'Uden navn'}</Text>
+                      <Text style={styles.activityTime}>
+                        {formatDuration(activity.whenStarted, activity.whenEnded)}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+          </View>
         </View>
-      </View>
+
 
       {/* Bottom Section */}
       <View style={styles.bottomContainer}>
@@ -275,15 +287,28 @@ const formatDuration = (startIso: string, endIso: string) => {
 const getActivityIcon = (name?: string | null) => {
   const value = (name || '').toLowerCase()
 
-  if (value.includes('tiktok')) return '🎵'
-  if (value.includes('youtube') || value.includes('yt')) return '📺'
-  if (value.includes('instagram') || value.includes('insta')) return '📸'
-  if (value.includes('facebook') || value.includes('fb')) return '👍'
-  if (value.includes('snap')) return '👻'
-  if (value.includes('netflix')) return '🍿'
-  if (value.includes('spotify') || value.includes('music')) return '🎧'
+  if (value.includes('tiktok'))
+    return <FontAwesomeIcon icon={faTiktok} size={24} color="#050505" />
+  if (value.includes('youtube') || value.includes('yt'))
+    return <FontAwesomeIcon icon={faYoutube} size={24} color="#FF0000" />
+  if (value.includes('instagram') || value.includes('insta'))
+    return <FontAwesomeIcon icon={faInstagram} size={24} color="#C13584" />
+  if (value.includes('facebook') || value.includes('fb'))
+    return <FontAwesomeIcon icon={faFacebook} size={24} color="#1877F3" />
+  if (value.includes('snap'))
+    return <FontAwesomeIcon icon={faSnapchat} size={24} color="#FFFC00" />
+  if (value.includes('spotify') || value.includes('music'))
+    return <FontAwesomeIcon icon={faSpotify} size={24} color="#1DB954" />
+  if (value.includes('netflix') || value.includes('movie') || value.includes('show'))  
+    return <FontAwesomeIcon icon={faNeos} size={24} color="#E50914" />
+  // Gaming icon
+  if (value.includes('gaming') || value.includes('game'))
+    return <FontAwesomeIcon icon={faSteam} size={24} color="#031647" />
+  // Programming icon
+  if (value.includes('programming') || value.includes('code') || value.includes('coding'))
+    return <FontAwesomeIcon icon={faDev} size={24} color="#000000" />
 
-  return '🕒'
+  return <FontAwesomeIcon icon={faClock} size={24} color="#4DAFFF" />
 }
 
 const styles = StyleSheet.create({
@@ -322,7 +347,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 16,
+    backgroundColor: '#F2F6FA',
   },
+    activitiesBox: {
+      height: 340,
+      width: '92%',
+      backgroundColor: '#fff',
+      borderRadius: 22,
+      borderWidth: 0,
+      padding: 14,
+      marginBottom: 18,
+      alignSelf: 'center',
+      shadowColor: '#4DAFFF',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+      elevation: 6,
+      overflow: 'hidden',
+    },
+    activitiesScrollContent: {
+      paddingHorizontal: 0,
+      paddingBottom: 16,
+    },
 
   subtitle: {
     fontSize: 18,
@@ -338,25 +385,33 @@ const styles = StyleSheet.create({
   activityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#CFE7FB',
-    borderRadius: 18,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderWidth: 2,
-    borderColor: '#8DB7DD',
+    backgroundColor: '#EAF4FF',
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 0,
     marginBottom: 10,
+    shadowColor: '#4DAFFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   activityIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#B6D3ED',
-    borderWidth: 2,
-    borderColor: '#8DB7DD',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#D6EFFF',
+    borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    shadowColor: '#4DAFFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.09,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   activityIcon: {
@@ -398,11 +453,16 @@ const styles = StyleSheet.create({
   },
 
   tilføjAktivitet: {
-    paddingVertical: 15,
+    paddingVertical: 17,
     width: '100%',
     backgroundColor: '#4DAFFF',
-    borderRadius: 10,
+    borderRadius: 14,
     alignItems: 'center',
+    shadowColor: '#4DAFFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.13,
+    shadowRadius: 6,
+    elevation: 3,
   },
 
   buttonDisabled: {
