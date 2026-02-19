@@ -4,8 +4,8 @@ import {
   View,
   TouchableOpacity,
   Image,
-  ImageBackground,
 } from 'react-native'
+import Background from '../../Components/Background'
 import React from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
@@ -22,11 +22,7 @@ type WelcomeScreenProps = NativeStackScreenProps<
 
 const LoginWelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
   return (
-    <ImageBackground
-      source={require('../../assets/images/Backgrund1.png')}
-      style={styles.container}
-      resizeMode="cover"
-    >
+    <Background>
       {/* Overlay for readability */}
       <View style={styles.overlay}>
         <View style={styles.logoContainer}>
@@ -59,7 +55,7 @@ const LoginWelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
           Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst
         </Text>
       </View>
-    </ImageBackground>
+    </Background>
   )
 }
 
@@ -68,6 +64,7 @@ export default LoginWelcomeScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // backgroundColor: '#fff',
   },
 
   overlay: {

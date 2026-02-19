@@ -1,11 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
+import Background from '../Components/Background'
 import React from 'react'
 
 const GraphScreen = () => {
   return (
-    <View>
-      <Text>GraphScreen</Text>
-    </View>
+    <Background>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>GraphScreen</Text>
+      </View>
+    </Background>
   )
 }
 

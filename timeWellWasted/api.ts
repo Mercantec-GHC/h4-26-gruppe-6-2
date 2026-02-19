@@ -1,5 +1,5 @@
-const BASE_URL = 'http://localhost:5197/api/User';
-const ACTIVITY_BASE_URL = 'http://localhost:5197/api/ActivityTask';
+const BASE_URL = 'https://timewellwasted-api.mercantec.tech/api/User';
+const ACTIVITY_BASE_URL = 'https://timewellwasted-api.mercantec.tech/api/ActivityTask';
 
 export async function login(email: string, password: string) {
   const response = await fetch(`${BASE_URL}/login`, {

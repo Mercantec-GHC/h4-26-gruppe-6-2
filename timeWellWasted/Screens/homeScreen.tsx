@@ -8,16 +8,17 @@ import {
   Modal,
   TextInput,
 } from 'react-native'
+import Background from '../Components/Background'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { AppStackParamList } from '../Navigation/AppNavigator'
+import { HomeStackParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { useEffect, useState } from 'react'
 
 
 
-type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
+type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>
 
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
@@ -116,7 +117,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   const viewProfile = () => {
-    navigation.navigate('Profile')
+    navigation.navigate('Profile' as never)
   }
 
   const logout = () => {
@@ -124,7 +125,8 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Background>
+      <SafeAreaView style={styles.container}>
       <Modal
         visible={showModal}
         transparent={true}
@@ -236,7 +238,8 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
           Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst
         </Text>
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Background>
   )
 }
 
@@ -289,7 +292,7 @@ const getActivityIcon = (name?: string | null) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
 
   headerContainer: {
@@ -430,7 +433,7 @@ const styles = StyleSheet.create({
   },
 
   modalContent: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     borderRadius: 15,
     padding: 20,
     width: '85%',
