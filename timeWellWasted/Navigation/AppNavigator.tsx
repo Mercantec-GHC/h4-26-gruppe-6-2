@@ -3,9 +3,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import HomeScreen from '../Screens/homeScreen'
 import ActivityScreen from '../Screens/activityScreen'
 import ProfileScreen from '../Screens/profileScreen'
+import GraphScreen from '../Screens/GraphScreen'
 
 export type AppStackParamList = {
   Home: { setIsLoggedIn: (value: boolean) => void }
+  Graph: { setIsLoggedIn: (value: boolean) => void }
   Activity: {
     activityId?: number
     activityName?: string
@@ -35,6 +37,10 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({ setIsLoggedIn }) => 
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
+      />
+      <Stack.Screen
+        name="Graph"
+        component={GraphScreen}
       />
     </Stack.Navigator>
   )

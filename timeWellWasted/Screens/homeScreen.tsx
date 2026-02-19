@@ -14,11 +14,11 @@ import { AppStackParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { useEffect, useState } from 'react'
-
-
-
+ 
+ 
+ 
 type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
-
+ 
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
   const [loading, setLoading] = useState(false)
@@ -28,7 +28,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [todayActivities, setTodayActivities] = useState<ActivityTask[]>([])
   const [isLoadingActivities, setIsLoadingActivities] = useState(true)
   const [activitiesError, setActivitiesError] = useState<string | null>(null)
-
+ 
   const loadTodayActivities = async () => {
     setIsLoadingActivities(true)
     setActivitiesError(null)
@@ -39,7 +39,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         setTodayActivities([])
         return
       }
-
+ 
       const items = await getTodayActivities(token)
       setTodayActivities(items)
     } catch (error) {
@@ -49,39 +49,39 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setIsLoadingActivities(false)
     }
   }
-
+ 
   useEffect(() => {
     loadTodayActivities()
   }, [])
-
+ 
   const tilføjAktivitet = () => {
     setShowModal(true)
   }
-
+ 
   const cancelModal = () => {
     setShowModal(false)
     setActivityName('')
     setActivityDescription('')
   }
-
+ 
   const opretAktivitet = async () => {
     if (!activityName.trim()) {
       alert('Skriv et navn på aktiviteten')
       return
     }
-
+ 
     setLoading(true)
     try {
       const token = await AsyncStorage.getItem('auth_token')
-      
+     
       if (!token) {
         alert('Ikke logget ind')
         setLoading(false)
         return
       }
-
+ 
       const now = new Date()
-      
+     
       const created = await createActivityTask(
         activityName,
         activityDescription,
@@ -89,14 +89,14 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         now.toISOString(),
         token
       )
-
+ 
       // Save latest activityId and info to AsyncStorage for ActivityScreen
       await AsyncStorage.setItem('latest_activity', JSON.stringify({
         activityId: created.activityId,
         activityName,
         activityDescription
       }))
-
+ 
       setShowModal(false)
       setActivityName('')
       setActivityDescription('')
@@ -114,15 +114,15 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setLoading(false)
     }
   }
-
+ 
   const viewProfile = () => {
     navigation.navigate('Profile')
   }
-
+ 
   const logout = () => {
     setIsLoggedIn(false)
   }
-
+ 
   return (
     <SafeAreaView style={styles.container}>
       <Modal
@@ -134,7 +134,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Opret Aktivitet</Text>
-            
+           
             <TextInput
               style={styles.modalInput}
               placeholder="Navn på aktivitet"
@@ -142,7 +142,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
               value={activityName}
               onChangeText={setActivityName}
             />
-
+ 
             <TextInput
               style={[styles.modalInput, styles.modalTextArea]}
               placeholder="Beskrivelse (valgfrit)"
@@ -152,7 +152,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
               multiline
               numberOfLines={3}
             />
-
+ 
             <View style={styles.modalButtonContainer}>
               <TouchableOpacity
                 style={styles.modalCancelButton}
@@ -160,7 +160,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
               >
                 <Text style={styles.modalButtonText}>Annuller</Text>
               </TouchableOpacity>
-
+ 
               <TouchableOpacity
                 style={[styles.modalCreateButton, loading && styles.buttonDisabled]}
                 onPress={opretAktivitet}
@@ -176,7 +176,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
-
+ 
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.title}>Din tid i dag</Text>
@@ -187,7 +187,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
           <Text style={styles.profileText}>Profil</Text>
         </TouchableOpacity>
       </View>
-
+ 
       {/* Middle Content */}
       <View style={styles.content}>
         <Text style={styles.subtitle}>Time Well Wasted</Text>
@@ -217,7 +217,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
           )}
         </View>
       </View>
-
+ 
       {/* Bottom Section */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
@@ -231,7 +231,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
             <Text style={styles.buttonText}>+ Tilføj Aktivitet</Text>
           )}
         </TouchableOpacity>
-
+ 
         <Text style={styles.footerText}>
           Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst
         </Text>
@@ -239,7 +239,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
     </SafeAreaView>
   )
 }
-
+ 
 export default HomeScreen
 type ActivityTask = {
   activityId: number
@@ -247,34 +247,34 @@ type ActivityTask = {
   whenStarted: string
   whenEnded: string
 }
-
+ 
 const formatDuration = (startIso: string, endIso: string) => {
   const start = new Date(startIso).getTime()
   const end = new Date(endIso).getTime()
-
+ 
   if (Number.isNaN(start) || Number.isNaN(end)) {
     return 'Ukendt varighed'
   }
-
+ 
   const totalSeconds = Math.max(0, Math.floor((end - start) / 1000))
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-
+ 
   if (hours > 0) {
     return `${hours}t ${minutes}m`
   }
-
+ 
   if (minutes > 0) {
     return `${minutes}m`
   }
-
+ 
   return `${seconds}s`
 }
-
+ 
 const getActivityIcon = (name?: string | null) => {
   const value = (name || '').toLowerCase()
-
+ 
   if (value.includes('tiktok')) return '🎵'
   if (value.includes('youtube') || value.includes('yt')) return '📺'
   if (value.includes('instagram') || value.includes('insta')) return '📸'
@@ -282,16 +282,16 @@ const getActivityIcon = (name?: string | null) => {
   if (value.includes('snap')) return '👻'
   if (value.includes('netflix')) return '🍿'
   if (value.includes('spotify') || value.includes('music')) return '🎧'
-
+ 
   return '🕒'
 }
-
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-
+ 
   headerContainer: {
     paddingHorizontal: 20,
     paddingTop: 10,
@@ -299,42 +299,42 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-
+ 
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
   },
-
+ 
   logoutText: {
     fontSize: 16,
     color: '#4DAFFF',
     fontWeight: '600',
   },
-
+ 
   profileText: {
     fontSize: 16,
     color: '#4DAFFF',
     fontWeight: '600',
   },
-
+ 
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
+ 
   subtitle: {
     fontSize: 18,
     color: '#666',
     marginBottom: 16,
   },
-
+ 
   listContainer: {
     width: '100%',
     paddingHorizontal: 20,
   },
-
+ 
   activityItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     borderColor: '#8DB7DD',
     marginBottom: 10,
   },
-
+ 
   activityIconWrap: {
     width: 44,
     height: 44,
@@ -358,45 +358,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
-
+ 
   activityIcon: {
     fontSize: 20,
   },
-
+ 
   activityTextWrap: {
     flex: 1,
   },
-
+ 
   activityName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
   },
-
+ 
   activityTime: {
     marginTop: 4,
     fontSize: 14,
     color: '#666',
   },
-
+ 
   emptyText: {
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
   },
-
+ 
   errorText: {
     fontSize: 14,
     color: '#D64545',
     textAlign: 'center',
   },
-
+ 
   bottomContainer: {
     paddingHorizontal: 20,
     paddingBottom: 30,
     alignItems: 'center',
   },
-
+ 
   tilføjAktivitet: {
     paddingVertical: 15,
     width: '100%',
@@ -404,31 +404,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-
+ 
   buttonDisabled: {
     opacity: 0.6,
   },
-
+ 
   buttonText: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
   },
-
+ 
   footerText: {
     marginTop: 30,
     fontSize: 16,
     color: '#585858',
     textAlign: 'center',
   },
-
+ 
   modalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-
+ 
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 15,
@@ -436,14 +436,14 @@ const styles = StyleSheet.create({
     width: '85%',
     alignItems: 'center',
   },
-
+ 
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
   },
-
+ 
   modalInput: {
     width: '100%',
     borderWidth: 1,
@@ -455,19 +455,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-
+ 
   modalTextArea: {
     height: 80,
     textAlignVertical: 'top',
   },
-
+ 
   modalButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     gap: 10,
   },
-
+ 
   modalCancelButton: {
     flex: 1,
     backgroundColor: '#ccc',
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
-
+ 
   modalCreateButton: {
     flex: 1,
     backgroundColor: '#4DAFFF',
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
-
+ 
   modalButtonText: {
     color: '#fff',
     fontSize: 16,

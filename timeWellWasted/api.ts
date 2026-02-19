@@ -66,6 +66,34 @@ export async function getTodayActivities(token: string) {
   return await response.json();
 }
 
+export async function getLast7DaysActivities(token: string) {
+  const response = await fetch(`${ACTIVITY_BASE_URL}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) throw new Error('Failed to fetch activities');
+
+  const activities = await response.json();
+
+  const now = new Date();
+  const startDate = new Date(now);
+  startDate.setHours(0, 0, 0, 0);
+  startDate.setDate(startDate.getDate() - 6);
+
+  return activities
+    .filter((activity: { whenStarted: string }) => {
+      const started = new Date(activity.whenStarted);
+      return started >= startDate && started <= now;
+    })
+    .sort(
+      (a: { whenStarted: string }, b: { whenStarted: string }) =>
+        new Date(b.whenStarted).getTime() - new Date(a.whenStarted).getTime()
+    );
+}
+
 
 // Update an activity task by id
 export async function updateActivityTask(
