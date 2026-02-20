@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import Background from '../Components/Background'
 import React from 'react'
 
 const ProfileScreen = () => {
   return (
-    <View style={styles.container}>
+    <Background>
+      <View style={styles.container}>
 
       
       <Image 
@@ -32,7 +34,8 @@ const ProfileScreen = () => {
           <Text style={styles.deleteButtonText}>Slet profil</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      </View>
+    </Background>
   )
 }
 
@@ -43,7 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: 60,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
 
   avatar: {

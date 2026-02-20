@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native'
+import Background from '../../Components/Background'
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { LoginStackParamList } from '../../Navigation/LoginNavigator'
-import { login } from '../../api'
+import { loginService } from '../../services/authService'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
@@ -16,34 +17,13 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
   const [error, setError] = useState('')
   const { setIsLoggedIn } = route.params
 
-  const handleLogin = async(email: string, password: string) => {
-  
-    try {
-      const data = await login(email, password);
-      console.log('Login successful, data:', data);
-
-      if (data && data.token) {
-
-        console.log('Saving userId to AsyncStorage:', data.user?.id)
-        await AsyncStorage.setItem('auth_token', data.token)
-        await AsyncStorage.setItem('auth_userId', String(data.user?.id))
-
-        // You can store the token in AsyncStorage or context for later use
-        console.log('Login successful, token:', data.token);
-        console.log('About to call setIsLoggedIn...');
-        setIsLoggedIn(true);
-        console.log('setIsLoggedIn called');
-      } else {
-        setError('Login failed. No token received.');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Login failed. Check your credentials.');
-    }
+  const handleLogin = async (email: string, password: string) => {
+    await loginService(email, password, setIsLoggedIn, setError);
   }
 
   return (
-    <View style={styles.container}>
+    <Background>
+      <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
               <Text style={styles.backButton}>← Back</Text>
       </TouchableOpacity>
@@ -73,7 +53,8 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
       <TouchableOpacity style={styles.button} onPress={() => handleLogin(email, password)}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
-    </View>
+      </View>
+    </Background>
   )
 }
 
@@ -85,7 +66,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor: '#f5f5f5',
   },
   backButton: {
     fontSize: 16,
