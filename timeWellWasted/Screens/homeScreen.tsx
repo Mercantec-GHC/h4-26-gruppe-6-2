@@ -106,7 +106,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
     loadTodayActivities()
   }
-
+ 
   return (
     <Background>
       <SafeAreaView style={styles.container}>
@@ -195,7 +195,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
     </Background>
   )
 }
-
+ 
 export default HomeScreen
 
 const styles = StyleSheet.create({
@@ -208,13 +208,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 10,
+    shadowColor: '#4DAFFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   listContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-
+ 
   emptyText: {
     fontSize: 14,
     color: '#999',
@@ -240,14 +245,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 20,
   },
-
+ 
   modalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-
+ 
   modalContent: {
     borderRadius: 15,
     padding: 20,
@@ -255,14 +260,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
-
+ 
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
   },
-
+ 
   modalInput: {
     width: '100%',
     borderWidth: 1,

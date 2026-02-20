@@ -7,12 +7,14 @@ import HomeScreen from '../Screens/homeScreen'
 import ActivityScreen from '../Screens/activityScreen'
 import GraphScreen from '../Screens/GraphScreen'
 import ProfileScreen from '../Screens/profileScreen'
+import GraphScreen from '../Screens/GraphScreen'
 
 /**
  * Stack Types
  */
 export type HomeStackParamList = {
   Home: { setIsLoggedIn: (value: boolean) => void }
+  Graph: { setIsLoggedIn: (value: boolean) => void }
   Activity: {
     activityId?: number
     activityName?: string
