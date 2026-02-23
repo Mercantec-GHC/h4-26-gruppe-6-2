@@ -10,23 +10,23 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { AppStackParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faTiktok, faYoutube, faInstagram, faFacebook, faSnapchat, faSpotify } from '@fortawesome/free-brands-svg-icons'
-import { faClock } from '@fortawesome/free-regular-svg-icons'
-import { faLaptopCode } from '@fortawesome/free-solid-svg-icons'
-import { faSteam } from '@fortawesome/free-brands-svg-icons/faSteam'
-import { faDev } from '@fortawesome/free-brands-svg-icons/faDev'
-import { faNeos } from '@fortawesome/free-brands-svg-icons/faNeos'
+//  import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+//  import { faTiktok, faYoutube, faInstagram, faFacebook, faSnapchat, faSpotify } from '@fortawesome/free-brands-svg-icons'
+// import { faClock } from '@fortawesome/free-regular-svg-icons'
+// import { faLaptopCode } from '@fortawesome/free-solid-svg-icons'
+// import { faSteam } from '@fortawesome/free-brands-svg-icons/faSteam'
+// import { faDev } from '@fortawesome/free-brands-svg-icons/faDev'
+// import { faNeos } from '@fortawesome/free-brands-svg-icons/faNeos'
+import { AppStackParamList } from '../Navigation/AppNavigator'
 
 
 
 
-type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
+    type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
  
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
@@ -213,7 +213,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
                   <View key={activity.activityId} style={[styles.activityItem, idx === 0 && {marginTop: 8}]}> 
                       <View style={styles.activityIconWrap}>
                         <Text style={styles.activityIcon}>
-                          {getActivityIcon(activity.activityName)}
+                          {/* {getActivityIcon(activity.activityName)} */}
                         </Text>
                       </View>
                     <View style={styles.activityTextWrap}>
@@ -284,32 +284,32 @@ const formatDuration = (startIso: string, endIso: string) => {
   return `${seconds}s`
 }
  
-const getActivityIcon = (name?: string | null) => {
-  const value = (name || '').toLowerCase()
+// const getActivityIcon = (name?: string | null) => {
+//   const value = (name || '').toLowerCase()
 
-  if (value.includes('tiktok'))
-    return <FontAwesomeIcon icon={faTiktok} size={24} color="#050505" />
-  if (value.includes('youtube') || value.includes('yt'))
-    return <FontAwesomeIcon icon={faYoutube} size={24} color="#FF0000" />
-  if (value.includes('instagram') || value.includes('insta'))
-    return <FontAwesomeIcon icon={faInstagram} size={24} color="#C13584" />
-  if (value.includes('facebook') || value.includes('fb'))
-    return <FontAwesomeIcon icon={faFacebook} size={24} color="#1877F3" />
-  if (value.includes('snap'))
-    return <FontAwesomeIcon icon={faSnapchat} size={24} color="#FFFC00" />
-  if (value.includes('spotify') || value.includes('music'))
-    return <FontAwesomeIcon icon={faSpotify} size={24} color="#1DB954" />
-  if (value.includes('netflix') || value.includes('movie') || value.includes('show'))  
-    return <FontAwesomeIcon icon={faNeos} size={24} color="#E50914" />
-  // Gaming icon
-  if (value.includes('gaming') || value.includes('game'))
-    return <FontAwesomeIcon icon={faSteam} size={24} color="#031647" />
-  // Programming icon
-  if (value.includes('programming') || value.includes('code') || value.includes('coding'))
-    return <FontAwesomeIcon icon={faDev} size={24} color="#000000" />
+//   if (value.includes('tiktok'))
+//     return <FontAwesomeIcon icon={faTiktok} size={24} color="#050505" />
+//   if (value.includes('youtube') || value.includes('yt'))
+//     return <FontAwesomeIcon icon={faYoutube} size={24} color="#FF0000" />
+//   if (value.includes('instagram') || value.includes('insta'))
+//     return <FontAwesomeIcon icon={faInstagram} size={24} color="#C13584" />
+//   if (value.includes('facebook') || value.includes('fb'))
+//     return <FontAwesomeIcon icon={faFacebook} size={24} color="#1877F3" />
+//   if (value.includes('snap'))
+//     return <FontAwesomeIcon icon={faSnapchat} size={24} color="#FFFC00" />
+//   if (value.includes('spotify') || value.includes('music'))
+//     return <FontAwesomeIcon icon={faSpotify} size={24} color="#1DB954" />
+//   if (value.includes('netflix') || value.includes('movie') || value.includes('show'))  
+//     return <FontAwesomeIcon icon={faNeos} size={24} color="#E50914" />
+//   // Gaming icon
+//   if (value.includes('gaming') || value.includes('game'))
+//     return <FontAwesomeIcon icon={faSteam} size={24} color="#031647" />
+//   // Programming icon
+//   if (value.includes('programming') || value.includes('code') || value.includes('coding'))
+//     return <FontAwesomeIcon icon={faDev} size={24} color="#000000" />
 
-  return <FontAwesomeIcon icon={faClock} size={24} color="#4DAFFF" />
-}
+//   return <FontAwesomeIcon icon={faClock} size={24} color="#4DAFFF" />
+// }
  
 const styles = StyleSheet.create({
   container: {
