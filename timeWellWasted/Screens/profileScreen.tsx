@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
+import { useTheme } from "../Hooks/useTheme";
 
 const ProfileScreen = () => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <View style={styles.container}>
 
@@ -20,7 +22,7 @@ const ProfileScreen = () => {
           <Text style={styles.buttonText}>Notifikationer</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={toggleTheme}>
           <Text style={styles.buttonText}>Dark / Light mode</Text>
         </TouchableOpacity>
 
