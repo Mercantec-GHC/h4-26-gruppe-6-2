@@ -332,7 +332,6 @@ const ActivityScreen: React.FC<Props> = ({ navigation, route }) => {
                     }),
                   },
                 ],
-                zIndex: 2,
               },
             ]}
           >
@@ -449,6 +448,8 @@ const ActivityScreen: React.FC<Props> = ({ navigation, route }) => {
       paddingHorizontal: 15,
       paddingVertical: -20,
       textAlign: 'center',
+      zIndex: 2,
+      elevation: 2,
     },
     clockHand: {
       position: 'absolute',
@@ -456,6 +457,8 @@ const ActivityScreen: React.FC<Props> = ({ navigation, route }) => {
       height: 170,
       justifyContent: 'flex-start',
       alignItems: 'center',
+      zIndex: 1,
+      elevation: 1,
     },
     handCircle: {
       width: 16,
