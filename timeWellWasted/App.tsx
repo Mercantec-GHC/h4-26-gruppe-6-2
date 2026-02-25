@@ -1,14 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { RootNavigator } from './Navigation/RootNavigator';
+import { ThemeProvider } from "./Hooks/ThemeProvider";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <>
-      <RootNavigator isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+    <ThemeProvider>
+      <RootNavigator 
+        isLoggedIn={isLoggedIn} 
+        setIsLoggedIn={setIsLoggedIn} 
+      />
       <StatusBar style="auto" />
-    </>
+    </ThemeProvider>
   );
 }

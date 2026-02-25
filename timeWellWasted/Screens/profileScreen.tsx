@@ -1,22 +1,18 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
-import { useTheme } from "../Hooks/useTheme";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
+import { useAppTheme } from "../Hooks/ThemeProvider";
 
 const ProfileScreen = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useAppTheme();
+  const currentColors = colors[theme];
   return (
-    <View style={styles.container}>
-
-      
-      <Image 
+    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
+      <Image
         source={require('../assets/images/LogoTime.png')}
         style={styles.avatar}
       />
+      <Text style={styles.username}>Username</Text>
 
-      
-      <Text style={styles.username}>UserName</Text>
-
-      
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Notifikationer</Text>
@@ -35,29 +31,47 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default ProfileScreen
+export const colors = {
+  light: {
+    background: "#ffffff",
+    text: "#000000",
+    card: "#f2f2f2",
+    buttonText: "#333333",
+    deleteButton: "#ffdddd",
+    deleteText: "#dd0000",
+  },
+  dark: {
+    background: "#000000",
+    text: "#ffffff",
+    card: "#222222",
+    buttonText: "#ffffff",
+    deleteButton: "#662222",
+    deleteText: "#ff6666",
+  }
+};
 
+
+export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     paddingTop: 60,
-    backgroundColor: '#fff',
   },
 
   avatar: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 15,
+    marginBottom: 20,
   },
 
   username: {
-    fontSize: 22,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 30,
   },
 
@@ -68,9 +82,9 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: '#f2f2f2',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    padding: 15,
     borderRadius: 10,
+    alignItems: 'center',
   },
 
   buttonText: {
@@ -80,14 +94,14 @@ const styles = StyleSheet.create({
 
   deleteButton: {
     backgroundColor: '#ffdddd',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    padding: 15,
     borderRadius: 10,
+    alignItems: 'center',
   },
 
   deleteButtonText: {
     fontSize: 16,
-    color: '#d00',
-    fontWeight: '600',
+    color: '#dd0000',
+    fontWeight: 'bold',
   },
-})
+});
