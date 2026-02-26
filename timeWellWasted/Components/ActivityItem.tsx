@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
-import { AppItem } from '../Data/apps'
+import { AppItem } from '../data/apps'
 
 type Props = {
   activityName?: string | null

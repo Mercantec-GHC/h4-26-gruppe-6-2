@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import Background from '../Components/Background'
+import Background from '../components/Background'
 import React from 'react'
 
 const timerScreen = () => {

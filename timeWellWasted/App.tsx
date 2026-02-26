@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { RootNavigator } from './Navigation/RootNavigator';
-import Background from './Components/Background';
+import { RootNavigator } from './navigation/RootNavigator';
+import Background from './components/Background';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

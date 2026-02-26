@@ -3,10 +3,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Ionicons } from '@expo/vector-icons'
 
-import HomeScreen from '../Screens/homeScreen'
-import ActivityScreen from '../Screens/activityScreen'
-import GraphScreen from '../Screens/GraphScreen'
-import ProfileScreen from '../Screens/profileScreen'
+import HomeScreen from '../screens/homeScreen'
+import ActivityScreen from '../screens/activityScreen'
+import GraphScreen from '../screens/GraphScreen'
+import ProfileScreen from '../screens/profileScreen'
 
 /**
  * Stack Types

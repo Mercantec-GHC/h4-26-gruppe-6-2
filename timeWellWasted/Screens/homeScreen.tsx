@@ -9,15 +9,15 @@ import {
   Image,
   FlatList,
 } from 'react-native'
-import Background from '../Components/Background'
+import Background from '../components/Background'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { HomeStackParamList } from '../Navigation/AppNavigator'
+import { HomeStackParamList } from '../navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { searchApps, findApp } from '../services/appMatcher'
-import { AppItem } from '../Data/apps'
-import ActivityItem from '../Components/ActivityItem'
+import { AppItem } from '../data/apps'
+import ActivityItem from '../components/ActivityItem'
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>
 

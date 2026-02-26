@@ -7,7 +7,7 @@ import {
   View,
   SafeAreaView,
 } from 'react-native'
-import Background from '../Components/Background'
+import Background from '../components/Background'
 import { useRoute, RouteProp } from '@react-navigation/native'
 import {
   getCurrentUserId,

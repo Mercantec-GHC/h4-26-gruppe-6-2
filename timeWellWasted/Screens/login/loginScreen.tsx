@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native'
-import Background from '../../Components/Background'
+import Background from '../../components/Background'
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { LoginStackParamList } from '../../Navigation/LoginNavigator'
+import { LoginStackParamList } from '../../navigation/LoginNavigator'
 import { loginService } from '../../services/authService'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 

@@ -1,4 +1,4 @@
-import { APPS, AppItem } from '../Data/apps'
+import { APPS, AppItem } from '../data/apps'
 
 export const findApp = (input: string): AppItem | null => {
   const value = input.trim().toLowerCase()

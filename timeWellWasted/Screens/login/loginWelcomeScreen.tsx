@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native'
-import Background from '../../Components/Background'
+import Background from '../../components/Background'
 import React from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 

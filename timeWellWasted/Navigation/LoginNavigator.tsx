@@ -1,8 +1,8 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import LoginWelcomeScreen from '../Screens/login/loginWelcomeScreen'
-import LoginScreen from '../Screens/login/loginScreen'
-import CreateUserScreen from '../Screens/login/createUserScreen'
+import LoginWelcomeScreen from '../screens/login/loginWelcomeScreen'
+import LoginScreen from '../screens/login/loginScreen'
+import CreateUserScreen from '../screens/login/createUserScreen'
 
 export type LoginStackParamList = {
   Welcome: undefined

@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Background from '../Components/Background'
+import Background from '../components/Background'
 
 const AppItem = ({
   name,
