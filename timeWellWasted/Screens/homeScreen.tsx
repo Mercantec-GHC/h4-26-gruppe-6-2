@@ -14,13 +14,15 @@ import { AppStackParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
 import { useEffect, useState } from 'react'
-
-
+import { useAppTheme } from '../Hooks/ThemeProvider'
+import { colors } from "../Screens/profileScreen"
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Home'>
 
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
+  const { theme } = useAppTheme()
+  const currentColors = colors[theme]
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [activityName, setActivityName] = useState('')
@@ -124,7 +126,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentColors.background }]}>
       <Modal
         visible={showModal}
         transparent={true}
@@ -132,21 +134,21 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         onRequestClose={cancelModal}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Opret Aktivitet</Text>
+          <View style={[styles.modalContent, { backgroundColor: currentColors.card }]}>
+            <Text style={[styles.modalTitle, { color: currentColors.text }]}>Opret Aktivitet</Text>
             
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { color: currentColors.text, borderColor: currentColors.text }]}
               placeholder="Navn på aktivitet"
-              placeholderTextColor="#999"
+              placeholderTextColor={currentColors.buttonText}
               value={activityName}
               onChangeText={setActivityName}
             />
 
             <TextInput
-              style={[styles.modalInput, styles.modalTextArea]}
+              style={[styles.modalInput, styles.modalTextArea, { color: currentColors.text, borderColor: currentColors.text }]}
               placeholder="Beskrivelse (valgfrit)"
-              placeholderTextColor="#999"
+              placeholderTextColor={currentColors.buttonText}
               value={activityDescription}
               onChangeText={setActivityDescription}
               multiline
@@ -154,22 +156,17 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
             />
 
             <View style={styles.modalButtonContainer}>
-              <TouchableOpacity
-                style={styles.modalCancelButton}
-                onPress={cancelModal}
-              >
-                <Text style={styles.modalButtonText}>Annuller</Text>
+              <TouchableOpacity style={[styles.modalCancelButton, { backgroundColor: currentColors.card }]} 
+                onPress={cancelModal} >
+                <Text style={[styles.modalButtonText, { color: currentColors.text }]}>Annuller</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.modalCreateButton, loading && styles.buttonDisabled]}
-                onPress={opretAktivitet}
-                disabled={loading}
-              >
+              <TouchableOpacity style={[styles.modalCreateButton, { backgroundColor: currentColors.card }]} 
+              onPress={opretAktivitet} disabled={loading} >
                 {loading ? (
                   <ActivityIndicator color="white" />
                 ) : (
-                  <Text style={styles.modalButtonText}>Opret</Text>
+                  <Text style={[styles.modalButtonText, { color: currentColors.text }]}>Opret</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -179,36 +176,42 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
       {/* Header */}
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Din tid i dag</Text>
+        <Text style={[styles.title, { color: currentColors.text }]}>Din tid i dag</Text>
+
         <TouchableOpacity onPress={logout}>
-          <Text style={styles.logoutText}>Log ud</Text>
+          <Text style={[styles.logoutText, { color: '#4DAFFF' }]}>Log ud</Text>
         </TouchableOpacity>
+
         <TouchableOpacity onPress={viewProfile}>
-          <Text style={styles.profileText}>Profil</Text>
+          <Text style={[styles.profileText, { color: '#4DAFFF' }]}>Profil</Text>
         </TouchableOpacity>
       </View>
 
       {/* Middle Content */}
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Time Well Wasted</Text>
+        <Text style={[styles.subtitle, { color: currentColors.text }]}>Time Well Wasted</Text>
+
         <View style={styles.listContainer}>
           {isLoadingActivities ? (
             <ActivityIndicator color="#4DAFFF" />
           ) : activitiesError ? (
-            <Text style={styles.errorText}>{activitiesError}</Text>
+            <Text style={[styles.errorText, { color: currentColors.deleteText }]}>{activitiesError}</Text>
           ) : todayActivities.length === 0 ? (
-            <Text style={styles.emptyText}>Ingen aktiviteter i dag</Text>
+            <Text style={[styles.emptyText, { color: currentColors.text }]}>Ingen aktiviteter i dag</Text>
           ) : (
             todayActivities.map((activity) => (
-              <View key={activity.activityId} style={styles.activityItem}>
-                <View style={styles.activityIconWrap}>
-                  <Text style={styles.activityIcon}>
+              <View key={activity.activityId} style={[ styles.activityItem, { backgroundColor: currentColors.card, borderColor: currentColors.text } ]} >
+                <View style={[styles.activityIconWrap, { backgroundColor: currentColors.card, borderColor: currentColors.text }]}>
+                  <Text style={[styles.activityIcon, { color: currentColors.text }]}>
                     {getActivityIcon(activity.activityName)}
                   </Text>
                 </View>
+
                 <View style={styles.activityTextWrap}>
-                  <Text style={styles.activityName}>{activity.activityName || 'Uden navn'}</Text>
-                  <Text style={styles.activityTime}>
+                  <Text style={[styles.activityName, { color: currentColors.text }]}>
+                    {activity.activityName || 'Uden navn'}
+                  </Text>
+                  <Text style={[styles.activityTime, { color: currentColors.text }]}>
                     {formatDuration(activity.whenStarted, activity.whenEnded)}
                   </Text>
                 </View>
@@ -220,11 +223,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
       {/* Bottom Section */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={[styles.tilføjAktivitet, loading && styles.buttonDisabled]}
-          onPress={tilføjAktivitet}
-          disabled={loading}
-        >
+        <TouchableOpacity style={[styles.tilføjAktivitet, { backgroundColor: '#4DAFFF' }]} onPress={tilføjAktivitet} disabled={loading} >
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
@@ -232,7 +231,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
           )}
         </TouchableOpacity>
 
-        <Text style={styles.footerText}>
+        <Text style={[styles.footerText, { color: currentColors.text }]}>
           Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst
         </Text>
       </View>

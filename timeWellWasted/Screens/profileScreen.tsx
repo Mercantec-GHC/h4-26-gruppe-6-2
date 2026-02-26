@@ -1,17 +1,27 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import { useAppTheme } from "../Hooks/ThemeProvider";
+import { AppStackParamList } from '../Navigation/AppNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack/lib/typescript/src/types';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const { theme, toggleTheme } = useAppTheme();
   const currentColors = colors[theme];
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   return (
     <View style={[styles.container, { backgroundColor: currentColors.background }]}>
       <Image
         source={require('../assets/images/LogoTime.png')}
         style={styles.avatar}
       />
-      <Text style={styles.username}>Username</Text>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home", { setIsLoggedIn: () => {} })}
+      >
+        <Text style={styles.buttonText}>Go to Home</Text>
+      </TouchableOpacity>
+
+      <Text style={[styles.username, { color: currentColors.text }]}>Username</Text>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button}>
