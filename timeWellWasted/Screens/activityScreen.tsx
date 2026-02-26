@@ -7,15 +7,18 @@ import {
   View,
   SafeAreaView,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import Background from '../Components/Background'
 import { useRoute, RouteProp } from '@react-navigation/native'
-import { updateActivityTask } from '../api'
+import {
+  getCurrentUserId,
+  loadLatestActivity,
+  loadTimer,
+  saveTimer,
+  removeTimer,
+  updateActivity
+} from '../services/activityService'
 
-const getCurrentUserId = async (): Promise<string | null> => {
-  return await AsyncStorage.getItem('auth_userId')
-}
 
-// Remove top-level await and STORAGE_KEY initialization
 
 type ActivityScreenRouteParams = {
   activityId?: number
@@ -38,15 +41,12 @@ const ActivityScreen = () => {
   useEffect(() => {
     if (activityName && activityDescription && activityId) return;
     const loadLatest = async () => {
-      try {
-        const latestJson = await AsyncStorage.getItem('latest_activity');
-        if (latestJson) {
-          const latest = JSON.parse(latestJson);
-          setActivityName(latest.activityName || "");
-          setActivityDescription(latest.activityDescription || "");
-          if (latest.activityId) setActivityId(latest.activityId);
-        }
-      } catch {}
+      const latest = await loadLatestActivity();
+      if (latest) {
+        setActivityName(latest.activityName || "");
+        setActivityDescription(latest.activityDescription || "");
+        if (latest.activityId) setActivityId(latest.activityId);
+      }
     };
     loadLatest();
   }, []);
@@ -54,40 +54,39 @@ const ActivityScreen = () => {
   // Restore timer on app start, only when userId is set
   useEffect(() => {
     const load = async () => {
-      const id = await getCurrentUserId()
-      console.log('Loaded userId from AsyncStorage:', id)
-      if (!id) return
-      setUserId(id)
-    }
-    load()
-  }, [])
+      const id = await getCurrentUserId();
+      if (!id) return;
+      setUserId(id);
+    };
+    load();
+  }, []);
 
   // Load timer for userId when it changes
   useEffect(() => {
-    if (!userId) return
-    const loadTimer = async () => {
-      const saved = await AsyncStorage.getItem(`timer_${userId}`)
-      if (!saved) return
-      const { start, isRunning, elapsed: savedElapsed, isPaused: savedPaused } = JSON.parse(saved)
+    if (!userId) return;
+    const loadTimerState = async () => {
+      const saved = await loadTimer(userId);
+      if (!saved) return;
+      const { start, isRunning, elapsed: savedElapsed, isPaused: savedPaused } = saved;
       if (isRunning) {
-        setStartTime(start)
-        setIsRunning(true)
-        setIsPaused(false)
-        setElapsed(Date.now() - start)
+        setStartTime(start);
+        setIsRunning(true);
+        setIsPaused(false);
+        setElapsed(Date.now() - start);
       } else if (savedPaused) {
-        setStartTime(null)
-        setIsRunning(false)
-        setIsPaused(true)
-        setElapsed(savedElapsed || 0)
+        setStartTime(null);
+        setIsRunning(false);
+        setIsPaused(true);
+        setElapsed(savedElapsed || 0);
       } else {
-        setStartTime(null)
-        setIsRunning(false)
-        setIsPaused(false)
-        setElapsed(0)
+        setStartTime(null);
+        setIsRunning(false);
+        setIsPaused(false);
+        setElapsed(0);
       }
-    }
-    loadTimer()
-  }, [userId])
+    };
+    loadTimerState();
+  }, [userId]);
 
   // UI ticking (foreground only)
   useEffect(() => {
@@ -100,50 +99,41 @@ const ActivityScreen = () => {
 
 
   const startTimer = async () => {
-    if (!userId) return
-    const start = Date.now()
-    await AsyncStorage.setItem(
-      `timer_${userId}`,
-      JSON.stringify({ start, isRunning: true, isPaused: false, elapsed: 0 })
-    )
-    setStartTime(start)
-    setIsRunning(true)
-    setIsPaused(false)
-    setElapsed(0)
-  }
+    if (!userId) return;
+    const start = Date.now();
+    await saveTimer(userId, { start, isRunning: true, isPaused: false, elapsed: 0 });
+    setStartTime(start);
+    setIsRunning(true);
+    setIsPaused(false);
+    setElapsed(0);
+  };
 
   const pauseTimer = async () => {
-    if (!userId || !isRunning || isPaused) return
-    await AsyncStorage.setItem(
-      `timer_${userId}`,
-      JSON.stringify({
-        start: null,
-        isRunning: false,
-        isPaused: true,
-        elapsed
-      })
-    )
-    setIsRunning(false)
-    setIsPaused(true)
-    setStartTime(null)
-  }
+    if (!userId || !isRunning || isPaused) return;
+    await saveTimer(userId, {
+      start: null,
+      isRunning: false,
+      isPaused: true,
+      elapsed
+    });
+    setIsRunning(false);
+    setIsPaused(true);
+    setStartTime(null);
+  };
 
   const resumeTimer = async () => {
-    if (!userId || !isPaused) return
-    const start = Date.now() - elapsed
-    await AsyncStorage.setItem(
-      `timer_${userId}`,
-      JSON.stringify({
-        start,
-        isRunning: true,
-        isPaused: false,
-        elapsed: 0
-      })
-    )
-    setStartTime(start)
-    setIsRunning(true)
-    setIsPaused(false)
-  }
+    if (!userId || !isPaused) return;
+    const start = Date.now() - elapsed;
+    await saveTimer(userId, {
+      start,
+      isRunning: true,
+      isPaused: false,
+      elapsed: 0
+    });
+    setStartTime(start);
+    setIsRunning(true);
+    setIsPaused(false);
+  };
 
   const stopTimer = async () => {
     if (!userId) return;
@@ -151,30 +141,15 @@ const ActivityScreen = () => {
     setIsPaused(false);
     setStartTime(null);
     // Do NOT reset elapsed, just stop counting
-
-    // Update activity in DB if possible
     try {
-      const token = await AsyncStorage.getItem('auth_token');
-      if (token && activityId && activityName) {
-        const whenStarted = startTime ? new Date(startTime).toISOString() : new Date(Date.now() - elapsed).toISOString();
-        const whenEnded = new Date(startTime ? startTime + elapsed : Date.now()).toISOString();
-        await updateActivityTask(
-          activityId,
-          {
-            activityId,
-            activityName,
-            description: activityDescription,
-            whenStarted,
-            whenEnded,
-          },
-          token
-        );
+      if (activityId && activityName) {
+        await updateActivity(activityId, activityName, activityDescription, startTime, elapsed);
       }
     } catch (e) {
       // Optionally show error
     }
-    await AsyncStorage.removeItem(`timer_${userId}`);
-  }
+    await removeTimer(userId);
+  };
 
 
   const formatTime = (ms: number) => {
@@ -192,7 +167,8 @@ const ActivityScreen = () => {
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Background>
+      <SafeAreaView style={styles.container}>
       <View style={styles.timerContainer}>
         <View style={styles.imageWrapper}>
           <Image
@@ -236,7 +212,8 @@ const ActivityScreen = () => {
           <Text style={styles.buttonText}>Stop</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Background>
 
     
   )
@@ -247,7 +224,7 @@ export default ActivityScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor: '#f5f5f5',
     paddingHorizontal: 20,
   },
 

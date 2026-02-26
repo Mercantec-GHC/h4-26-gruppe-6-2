@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
+import Background from '../../Components/Background'
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { LoginStackParamList } from '../../Navigation/LoginNavigator'
-import { register } from '../../api'
+import { registerService } from '../../services/registerService'
 
 type CreateUserScreenProps = NativeStackScreenProps<LoginStackParamList, 'CreateUser'>
 
@@ -15,37 +16,20 @@ const CreateUserScreen = ({ navigation, route }: CreateUserScreenProps) => {
   const { setIsLoggedIn } = route.params
 
   const handleCreateUser = async () => {
-    // Validering
-    if (!email || !password || !confirmPassword || !name) {
-      alert('Udfyld alle felter')
-      return
-    }
-
-    if (password !== confirmPassword) {
-      alert('Adgangskoderne stemmer ikke overens')
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      await register({
-        email: email,
-        username: name,
-        passwordHash: password,
-      })
-      alert('Konto oprettet!')
-      setIsLoggedIn(true)
-    } catch (error) {
-      console.error('Fejl ved oprettelse af konto:', error)
-      alert('Kunne ikke oprette konto. Kontroller din forbindelse og prøv igen.')
-    } finally {
-      setLoading(false)
-    }
+    await registerService(
+      email,
+      name,
+      password,
+      confirmPassword,
+      setIsLoggedIn,
+      setLoading,
+      alert
+    );
   }
 
   return (
-    <View style={styles.container}>
+    <Background>
+      <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.backButton}>← Back</Text>
       </TouchableOpacity>
@@ -98,7 +82,8 @@ const CreateUserScreen = ({ navigation, route }: CreateUserScreenProps) => {
           <Text style={styles.buttonText}>Create Account</Text>
         )}
       </TouchableOpacity>
-    </View>
+      </View>
+    </Background>
   )
 }
 
@@ -109,7 +94,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor: '#f5f5f5',
   },
   backButton: {
     fontSize: 16,

@@ -1,17 +1,22 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import Background from '../Components/Background'
 import React from 'react';
 import { useAppTheme } from "../Hooks/ThemeProvider";
 import { AppStackParamList } from '../Navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack/lib/typescript/src/types';
 import { useNavigation } from '@react-navigation/native';
 
+
 const ProfileScreen = () => {
   const { theme, toggleTheme } = useAppTheme();
   const currentColors = colors[theme];
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   return (
+
+  <Background>
     <View style={[styles.container, { backgroundColor: currentColors.background }]}>
       <Image
+
         source={require('../assets/images/LogoTime.png')}
         style={styles.avatar}
       />
@@ -40,7 +45,8 @@ const ProfileScreen = () => {
           <Text style={styles.deleteButtonText}>Slet profil</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      </View>
+    </Background>
   );
 };
 
@@ -65,6 +71,7 @@ export const colors = {
 
 
 export default ProfileScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
