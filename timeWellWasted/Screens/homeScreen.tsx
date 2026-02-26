@@ -18,6 +18,7 @@ import { createActivityTask, getTodayActivities } from '../api'
 import { searchApps, findApp } from '../services/appMatcher'
 import { AppItem } from '../data/apps'
 import ActivityItem from '../components/ActivityItem'
+import { useFocusEffect } from '@react-navigation/native'
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>
 
@@ -31,14 +32,11 @@ type ActivityTask = {
 const formatDuration = (startIso: string, endIso: string) => {
   const start = new Date(startIso).getTime()
   const end = new Date(endIso).getTime()
-
   if (Number.isNaN(start) || Number.isNaN(end)) return 'Ukendt varighed'
-
   const totalSeconds = Math.max(0, Math.floor((end - start) / 1000))
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-
   if (hours > 0) return `${hours}t ${minutes}m`
   if (minutes > 0) return `${minutes}m`
   return `${seconds}s`
@@ -53,16 +51,19 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [suggestions, setSuggestions] = useState<AppItem[]>([])
   const [todayActivities, setTodayActivities] = useState<ActivityTask[]>([])
 
-  useEffect(() => {
-    loadTodayActivities()
-  }, [])
-
+  // Load activities whenever the screen comes into focus
   const loadTodayActivities = async () => {
     const token = await AsyncStorage.getItem('auth_token')
     if (!token) return
     const items = await getTodayActivities(token)
     setTodayActivities(items)
   }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadTodayActivities()
+    }, [])
+  )
 
   const createActivity = async () => {
     const matched = findApp(activityName)
@@ -127,7 +128,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
                 whenEnded={item.whenEnded}
                 app={app ?? undefined} // convert null -> undefined
                 formatDuration={formatDuration}
-                />
+              />
             )
           }}
           ListEmptyComponent={
@@ -140,6 +141,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setShowModal(true)}
+          testID='AddActivityButton'
         >
           <Text style={styles.addButtonText}>+ Tilføj Aktivitet</Text>
         </TouchableOpacity>
@@ -153,10 +155,22 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         <Modal visible={showModal} transparent animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
+              {/* Close Button */}
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => {
+                  setShowModal(false)
+                  setSuggestions([])
+                }}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+
               <Text style={styles.modalTitle}>Vælg App</Text>
 
               <TextInput
                 style={styles.modalInput}
+                testID='ActivityNameBox'
                 placeholder="Søg app..."
                 value={activityName}
                 onChangeText={(text) => {
@@ -170,6 +184,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <TouchableOpacity
+                    testID='ConfirmAddActivityButton'
                     style={styles.suggestionItem}
                     onPress={() => {
                       setActivityName(item.name)
@@ -185,6 +200,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
               <TouchableOpacity
                 style={styles.createButton}
                 onPress={createActivity}
+                testID='Start'
               >
                 <Text style={{ color: '#fff', fontWeight: 'bold' }}>Start</Text>
               </TouchableOpacity>
@@ -254,6 +270,19 @@ const styles = StyleSheet.create({
     width: '85%',
     alignItems: 'center',
     backgroundColor: '#fff',
+  },
+
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
+
+  closeButtonText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
   },
 
   modalTitle: {

@@ -39,6 +39,7 @@ const LoginWelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
 
         <TouchableOpacity
           style={styles.button}
+          testID='LoginButton'
           onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.buttonText}>Login</Text>

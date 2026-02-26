@@ -22,7 +22,8 @@ export const loadTimer = async (userId: string) => {
 };
 
 export const saveTimer = async (userId: string, timerObj: any) => {
-  await AsyncStorage.setItem(`timer_${userId}`,
+  await AsyncStorage.setItem(
+    `timer_${userId}`,
     JSON.stringify(timerObj)
   );
 };
@@ -39,9 +40,17 @@ export const updateActivity = async (
   elapsed: number,
 ) => {
   const token = await AsyncStorage.getItem('auth_token');
+
+  const whenStarted = startTime
+    ? new Date(startTime).toISOString()
+    : new Date(Date.now() - elapsed).toISOString();
+
+  const whenEnded = new Date(
+    startTime ? startTime + elapsed : Date.now()
+  ).toISOString();
+
+  // 🔹 Existing backend logic (UNCHANGED)
   if (token && activityId && activityName) {
-    const whenStarted = startTime ? new Date(startTime).toISOString() : new Date(Date.now() - elapsed).toISOString();
-    const whenEnded = new Date(startTime ? startTime + elapsed : Date.now()).toISOString();
     await updateActivityTask(
       activityId,
       {
@@ -53,5 +62,28 @@ export const updateActivity = async (
       },
       token
     );
+  }
+
+  // 🔹 ADDED: Save locally for weekly graph
+  try {
+    const existing = await AsyncStorage.getItem('activities');
+    const activities = existing ? JSON.parse(existing) : [];
+
+    activities.push({
+      activityId,
+      activityName,
+      description: activityDescription,
+      whenStarted,
+      whenEnded,
+    });
+
+    await AsyncStorage.setItem(
+      'activities',
+      JSON.stringify(activities)
+    );
+    const check = await AsyncStorage.getItem('activities');
+console.log('SAVED ACTIVITIES:', check);
+  } catch (error) {
+    console.log('Local activity save failed:', error);
   }
 };

@@ -23,7 +23,7 @@ export const registerService = async (
     await register({
       email: email,
       username: name,
-      passwordHash: password,
+      password: password,
     });
     alert('Konto oprettet!');
     setIsLoggedIn(true);

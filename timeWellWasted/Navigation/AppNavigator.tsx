@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 
 import HomeScreen from '../screens/homeScreen'
 import ActivityScreen from '../screens/activityScreen'
-import GraphScreen from '../screens/GraphScreen'
+import GraphScreen from '../screens/graphScreen'
 import ProfileScreen from '../screens/profileScreen'
 
 /**

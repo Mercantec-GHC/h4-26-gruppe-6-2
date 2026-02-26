@@ -1,0 +1,24 @@
+appId: "com.timewellwasted"
+---
+- openLink: exp://127.0.0.1:8081
+
+- assertVisible: "Din tid i dag"
+
+- tapOn: 
+    id: "AddActivityButton"
+
+- tapOn: 
+    id: "ActivityNameBox"
+
+- inputText: "instagram"
+
+- tapOn: 
+    id: "Start"
+
+- tapOn:
+    id: "StartActivityButton"
+
+- wait: 5000
+
+- tapOn:
+    id: "StopActivityButton"

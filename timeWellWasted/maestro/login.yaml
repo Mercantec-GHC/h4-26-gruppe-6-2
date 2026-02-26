@@ -1,0 +1,21 @@
+appId: "com.timewellwasted"
+---
+- openLink: exp://127.0.0.1:8081
+- assertVisible: "Login"
+- tapOn: 
+    id: "LoginButton" 
+
+- tapOn: 
+    id: "EmailBox"
+- inputText: "Test"
+
+- tapOn: 
+    id: "PasswordBox"
+- inputText: "Test"
+
+- hideKeyboard
+
+- tapOn: 
+    id: "ConfirmLoginButton"
+  
+- assertVisible: "Din tid i dag"

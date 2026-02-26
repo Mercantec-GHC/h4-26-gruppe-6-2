@@ -34,6 +34,7 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
       
       <TextInput
         style={styles.input}
+        testID='EmailBox'
         placeholder="Email"
         placeholderTextColor="#999"
         value={email}
@@ -43,6 +44,7 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
       
       <TextInput
         style={styles.input}
+        testID='PasswordBox'
         placeholder="Password"
         placeholderTextColor="#999"
         value={password}
@@ -50,7 +52,7 @@ const LoginScreen = ({ navigation, route }: LoginScreenProps) => {
         secureTextEntry
       />
       
-      <TouchableOpacity style={styles.button} onPress={() => handleLogin(email, password)}>
+      <TouchableOpacity style={styles.button} onPress={() => handleLogin(email, password)} testID='ConfirmLoginButton'>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       </View>
