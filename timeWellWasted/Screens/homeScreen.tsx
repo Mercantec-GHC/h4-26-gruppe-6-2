@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import * as React from 'react'
+import { useEffect, useState } from 'react'
 import {
   StyleSheet,
   Text,
@@ -15,6 +16,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { HomeStackParamList } from '../Navigation/AppNavigator'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createActivityTask, getTodayActivities } from '../api'
+
+import { useAppTheme } from '../Hooks/ThemeProvider'
+import { colors } from "../Screens/profileScreen"
 import { searchApps, findApp } from '../services/appMatcher'
 import { AppItem } from '../Data/apps'
 import ActivityItem from '../Components/ActivityItem'
@@ -46,7 +50,9 @@ const formatDuration = (startIso: string, endIso: string) => {
 
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { setIsLoggedIn } = route.params
-
+  const { theme } = useAppTheme()
+  const currentColors = colors[theme]
+  const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [activityName, setActivityName] = useState('')
   const [activityDescription, setActivityDescription] = useState('')
@@ -108,45 +114,114 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   return (
-    <Background>
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <Text style={styles.headerText}>Din tid i dag</Text>
+  <Background>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentColors.background }]}>
+      <Modal
+        visible={showModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={cancelModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={[styles.modalContent, { backgroundColor: currentColors.card }]}>
+            <Text style={[styles.modalTitle, { color: currentColors.text }]}>Opret Aktivitet</Text>
+            
+            <TextInput
+              style={[styles.modalInput, { color: currentColors.text, borderColor: currentColors.text }]}
+              placeholder="Navn på aktivitet"
+              placeholderTextColor={currentColors.buttonText}
+              value={activityName}
+              onChangeText={setActivityName}
+            />
 
-        {/* Scrollable Activities List */}
-        <FlatList
-          data={todayActivities}
-          keyExtractor={(item) => item.activityId.toString()}
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => {
-            const app = findApp(item.activityName || '')
-            return (
-              <ActivityItem
-                activityName={item.activityName}
-                whenStarted={item.whenStarted}
-                whenEnded={item.whenEnded}
-                app={app ?? undefined} // convert null -> undefined
-                formatDuration={formatDuration}
-                />
-            )
-          }}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>Ingen aktiviteter i dag</Text>
-          }
-          showsVerticalScrollIndicator={false}
-        />
+            <TextInput
+              style={[styles.modalInput, styles.modalTextArea, { color: currentColors.text, borderColor: currentColors.text }]}
+              placeholder="Beskrivelse (valgfrit)"
+              placeholderTextColor={currentColors.buttonText}
+              value={activityDescription}
+              onChangeText={setActivityDescription}
+              multiline
+              numberOfLines={3}
+            />
 
-        {/* Add Activity Button */}
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowModal(true)}
-        >
-          <Text style={styles.addButtonText}>+ Tilføj Aktivitet</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={[styles.modalCancelButton, { backgroundColor: currentColors.card }]} 
+                onPress={cancelModal} >
+                <Text style={[styles.modalButtonText, { color: currentColors.text }]}>Annuller</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={[styles.modalCreateButton, { backgroundColor: currentColors.card }]} 
+              onPress={opretAktivitet} disabled={loading} >
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={[styles.modalButtonText, { color: currentColors.text }]}>Opret</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <Text style={[styles.title, { color: currentColors.text }]}>Din tid i dag</Text>
+
+        <TouchableOpacity onPress={logout}>
+          <Text style={[styles.logoutText, { color: '#4DAFFF' }]}>Log ud</Text>
         </TouchableOpacity>
 
-        {/* Footer Text */}
-        <Text style={styles.footerText}>
-          Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst.
+        <TouchableOpacity onPress={viewProfile}>
+          <Text style={[styles.profileText, { color: '#4DAFFF' }]}>Profil</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Middle Content */}
+      <View style={styles.content}>
+        <Text style={[styles.subtitle, { color: currentColors.text }]}>Time Well Wasted</Text>
+
+        <View style={styles.listContainer}>
+          {isLoadingActivities ? (
+            <ActivityIndicator color="#4DAFFF" />
+          ) : activitiesError ? (
+            <Text style={[styles.errorText, { color: currentColors.deleteText }]}>{activitiesError}</Text>
+          ) : todayActivities.length === 0 ? (
+            <Text style={[styles.emptyText, { color: currentColors.text }]}>Ingen aktiviteter i dag</Text>
+          ) : (
+            todayActivities.map((activity) => (
+              <View key={activity.activityId} style={[ styles.activityItem, { backgroundColor: currentColors.card, borderColor: currentColors.text } ]} >
+                <View style={[styles.activityIconWrap, { backgroundColor: currentColors.card, borderColor: currentColors.text }]}>
+                  <Text style={[styles.activityIcon, { color: currentColors.text }]}>
+                    {getActivityIcon(activity.activityName)}
+                  </Text>
+                </View>
+
+                <View style={styles.activityTextWrap}>
+                  <Text style={[styles.activityName, { color: currentColors.text }]}>
+                    {activity.activityName || 'Uden navn'}
+                  </Text>
+                  <Text style={[styles.activityTime, { color: currentColors.text }]}>
+                    {formatDuration(activity.whenStarted, activity.whenEnded)}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+      </View>
+
+      {/* Bottom Section */}
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity style={[styles.tilføjAktivitet, { backgroundColor: '#4DAFFF' }]} onPress={tilføjAktivitet} disabled={loading} >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.buttonText}>+ Tilføj Aktivitet</Text>
+          )}
+        </TouchableOpacity>
+
+        <Text style={[styles.footerText, { color: currentColors.text }]}>
+          Vi lover ikke at gøre dig perfekt - bare lidt mere bevidst
         </Text>
 
         {/* Modal */}

@@ -1,28 +1,39 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import Background from '../Components/Background'
-import React from 'react'
+import React from 'react';
+import { useAppTheme } from "../Hooks/ThemeProvider";
+import { AppStackParamList } from '../Navigation/AppNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack/lib/typescript/src/types';
+import { useNavigation } from '@react-navigation/native';
+
 
 const ProfileScreen = () => {
+  const { theme, toggleTheme } = useAppTheme();
+  const currentColors = colors[theme];
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   return (
-    <Background>
-      <View style={styles.container}>
 
-      
-      <Image 
+  <Background>
+    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
+      <Image
+
         source={require('../assets/images/LogoTime.png')}
         style={styles.avatar}
       />
 
-      
-      <Text style={styles.username}>UserName</Text>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home", { setIsLoggedIn: () => {} })}
+      >
+        <Text style={styles.buttonText}>Go to Home</Text>
+      </TouchableOpacity>
 
-      
+      <Text style={[styles.username, { color: currentColors.text }]}>Username</Text>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Notifikationer</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={toggleTheme}>
           <Text style={styles.buttonText}>Dark / Light mode</Text>
         </TouchableOpacity>
 
@@ -36,29 +47,48 @@ const ProfileScreen = () => {
       </View>
       </View>
     </Background>
-  )
-}
+  );
+};
 
-export default ProfileScreen
+export const colors = {
+  light: {
+    background: "#ffffff",
+    text: "#000000",
+    card: "#f2f2f2",
+    buttonText: "#333333",
+    deleteButton: "#ffdddd",
+    deleteText: "#dd0000",
+  },
+  dark: {
+    background: "#000000",
+    text: "#ffffff",
+    card: "#222222",
+    buttonText: "#ffffff",
+    deleteButton: "#662222",
+    deleteText: "#ff6666",
+  }
+};
+
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     paddingTop: 60,
-    // backgroundColor: '#fff',
   },
 
   avatar: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 15,
+    marginBottom: 20,
   },
 
   username: {
-    fontSize: 22,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 30,
   },
 
@@ -69,9 +99,9 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: '#f2f2f2',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    padding: 15,
     borderRadius: 10,
+    alignItems: 'center',
   },
 
   buttonText: {
@@ -81,14 +111,14 @@ const styles = StyleSheet.create({
 
   deleteButton: {
     backgroundColor: '#ffdddd',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    padding: 15,
     borderRadius: 10,
+    alignItems: 'center',
   },
 
   deleteButtonText: {
     fontSize: 16,
-    color: '#d00',
-    fontWeight: '600',
+    color: '#dd0000',
+    fontWeight: 'bold',
   },
-})
+});
