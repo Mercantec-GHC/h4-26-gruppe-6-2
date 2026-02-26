@@ -9,6 +9,7 @@ import {
   TextInput,
   Image,
   FlatList,
+  ActivityIndicator,
 } from 'react-native'
 import Background from '../Components/Background'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -111,6 +112,21 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
     })
 
     loadTodayActivities()
+  }
+
+  const cancelModal = () => {
+    setShowModal(false)
+    setActivityName('')
+    setActivityDescription('')
+    setSuggestions([])
+  }
+
+  const opretAktivitet = () => {
+    setShowModal(true)
+  }
+
+  const viewProfile = () => {
+    navigation.navigate('Profile')
   }
 
   return (
@@ -266,7 +282,8 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
             </View>
           </View>
         </Modal>
-      </SafeAreaView>
+      </View>
+    </SafeAreaView>
     </Background>
   )
 }
@@ -289,6 +306,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
+
+  modalButtonText: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "600",
+},
+
+headerContainer: {
+  paddingHorizontal: 20,
+  paddingTop: 10,
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+},
+
+title: {
+  fontSize: 28,
+  fontWeight: "bold",
+  color: "#333",
+},
+
+logoutText: {
+  fontSize: 16,
+  color: "#4DAFFF",
+  fontWeight: "600",
+},
+
+profileText: {
+  fontSize: 16,
+  color: "#4DAFFF",
+  fontWeight: "600",
+},
+
 
   emptyText: {
     fontSize: 14,
@@ -323,6 +373,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  modalButtonContainer: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  width: "100%",
+  gap: 10,
+},
+
+modalCancelButton: {
+  flex: 1,
+  backgroundColor: "#ccc",
+  paddingVertical: 12,
+  borderRadius: 8,
+  alignItems: "center",
+},
+
+modalCreateButton: {
+  flex: 1,
+  backgroundColor: "#4DAFFF",
+  paddingVertical: 12,
+  borderRadius: 8,
+  alignItems: "center",
+},
+
   modalContent: {
     borderRadius: 15,
     padding: 20,
@@ -348,6 +421,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
     color: '#333',
+  },
+
+  modalTextArea: {
+    height: 100,
+    textAlignVertical: 'top',
   },
 
   suggestionItem: {
