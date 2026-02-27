@@ -1,7 +1,9 @@
 appId: "com.timewellwasted"
 ---
 - openLink: exp://127.0.0.1:8081
+
 - assertVisible: "Login"
+
 - tapOn: 
     id: "LoginButton" 
 

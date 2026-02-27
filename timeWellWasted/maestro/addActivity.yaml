@@ -10,7 +10,7 @@ appId: "com.timewellwasted"
 - tapOn: 
     id: "ActivityNameBox"
 
-- inputText: "instagram"
+- inputText: "youtube"
 
 - tapOn: 
     id: "Start"
@@ -18,7 +18,10 @@ appId: "com.timewellwasted"
 - tapOn:
     id: "StartActivityButton"
 
-- wait: 5000
+- extendedWaitUntil:
+    notVisible:
+      id: "ThisElementDoesNotExist"
+    timeout: 670000
 
 - tapOn:
     id: "StopActivityButton"
