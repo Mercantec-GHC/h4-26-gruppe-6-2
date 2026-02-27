@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   totalBox: {
-    backgroundColor: '#BBD7F0',
+    backgroundColor: '#ffffff',
     borderRadius: 25,
     paddingVertical: 20,
     marginBottom: 30,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-    backgroundColor: '#BBD7F0',
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     padding: 15,
     marginBottom: 15,
