@@ -1,39 +1,61 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native'
 import Background from '../components/Background'
 import React from 'react'
+import { logout } from '../services/logoutService'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { BottomTabParamList } from '../navigation/AppNavigator'
 
-const ProfileScreen = () => {
+type Props = NativeStackScreenProps<BottomTabParamList, 'Profile'>;
+
+const ProfileScreen: React.FC<Props> = ({ route }) => {
+  const { setIsLoggedIn } = route.params;
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Log ud',
+      'Er du sikker på, at du vil logge ud?',
+      [
+        { text: 'Annuller', style: 'cancel' },
+        {
+          text: 'Log ud',
+          onPress: async () => {
+            await logout();
+            setIsLoggedIn(false);
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
+
   return (
     <Background>
       <View style={styles.container}>
+        <Image
+          source={require('../assets/images/LogoTime.png')}
+          style={styles.avatar}
+        />
 
-      
-      <Image 
-        source={require('../assets/images/LogoTime.png')}
-        style={styles.avatar}
-      />
+        <Text style={styles.username}>UserName</Text>
 
-      
-      <Text style={styles.username}>UserName</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Notifikationer</Text>
+          </TouchableOpacity>
 
-      
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Notifikationer</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Dark / Light mode</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Dark / Light mode</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Rediger profiloplysninger</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Rediger profiloplysninger</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Log ud</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.deleteButton}>
-          <Text style={styles.deleteButtonText}>Slet profil</Text>
-        </TouchableOpacity>
-      </View>
+        </View>
       </View>
     </Background>
   )
@@ -46,7 +68,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: 60,
-    // backgroundColor: '#fff',
   },
 
   avatar: {
@@ -77,6 +98,20 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: '#333',
+  },
+
+  logoutButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  logoutButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
   },
 
   deleteButton: {
