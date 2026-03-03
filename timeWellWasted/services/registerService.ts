@@ -1,4 +1,6 @@
 import { register } from '../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { login } from '../api';
 
 export const registerService = async (
   email: string,
@@ -23,10 +25,16 @@ export const registerService = async (
     await register({
       email: email,
       username: name,
-      passwordHash: password,
+      password: password,
     });
     alert('Konto oprettet!');
-    setIsLoggedIn(true);
+    const data = await login(email, password);
+    if (data && data.token) {
+      console.log("TOKEN RECEIVED:", data.token); // DEV PURPOSE, LEAVE OUT OF PRODUCTION
+      await AsyncStorage.setItem('auth_token', data.token);
+      await AsyncStorage.setItem('auth_userId', String(data.user?.id));
+      setIsLoggedIn(true);
+    }
   } catch (error) {
     alert('Kunne ikke oprette konto. Kontroller din forbindelse og prøv igen.');
   } finally {

@@ -7,6 +7,7 @@ import HomeScreen from '../Screens/homeScreen'
 import ActivityScreen from '../Screens/activityScreen'
 import GraphScreen from '../Screens/GraphScreen'
 import ProfileScreen from '../Screens/profileScreen'
+import UpdateUserScreen from '../Screens/updateUserScreen'
 
 /**
  * Stack Types
@@ -18,16 +19,22 @@ export type HomeStackParamList = {
     activityName?: string
     activityDescription?: string
   }
+  Profile: { setIsLoggedIn: (value: boolean) => void };
+  UpdateUser: { setIsLoggedIn: (value: boolean) => void };
 }
 
 /**
  * Bottom Tabs Types
  */
 export type BottomTabParamList = {
-  HomeTab: undefined
+  HomeTab: {
+    screen?: keyof HomeStackParamList
+    params?: HomeStackParamList[keyof HomeStackParamList]
+  }
   Graph: undefined
-  Profile: undefined
+  Profile: { setIsLoggedIn: (value: boolean) => void }
 }
+
 
 const Stack = createNativeStackNavigator<HomeStackParamList>()
 const Tab = createBottomTabNavigator<BottomTabParamList>()
@@ -52,6 +59,16 @@ const HomeStack: React.FC<{ setIsLoggedIn: (value: boolean) => void }> = ({
       <Stack.Screen
         name="Activity"
         component={ActivityScreen}
+      />
+      <Stack.Screen
+        name="Profile" 
+        component={ProfileScreen}
+        initialParams={{ setIsLoggedIn }}
+      />
+      <Stack.Screen
+        name="UpdateUser" 
+        component={UpdateUserScreen}
+        initialParams={{ setIsLoggedIn }}
       />
     </Stack.Navigator>
   )
@@ -89,7 +106,7 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({
         tabBarInactiveTintColor: 'gray',
         tabBarIcon: ({ focused, color, size }) => {
           const icons = tabIcons[route.name]
-
+          
           return (
             <Ionicons
               name={focused ? icons.active : icons.inactive}
@@ -115,6 +132,7 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        initialParams={{ setIsLoggedIn }}
       />
     </Tab.Navigator>
   )
